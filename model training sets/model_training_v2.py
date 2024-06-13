@@ -31,22 +31,5 @@ model.fit(x_train.reshape((x_train.shape[0], x_train.shape[1], 1)), y_train,
           epochs=150, verbose=1, validation_data=(x_val.reshape((x_val.shape[0], x_val.shape[1], 1)), y_val),
           steps_per_epoch=steps_per_epoch)
 
-# Function to make predictions on custom input
-def make_custom_prediction(model, input_data):
-    # Convert input data to a NumPy array and reshape it for model input
-    input_data = np.array(input_data).reshape((1, len(input_data), 1))
-    
-    # Make prediction on the input data
-    prediction = model.predict(input_data)
-    
-    # Convert prediction to whole integer
-    prediction_rounded = int(np.round(prediction))
-    
-    return prediction_rounded
-
-# Example usage
-input_data = [1,2,1,2]  # Your custom input data
-custom_prediction = make_custom_prediction(model, input_data)
-print("Custom Prediction:", custom_prediction)
 model.save("models/my_model_v3.h5")
 
