@@ -1,36 +1,38 @@
 import numpy as np
 from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
+from math import sqrt
+
 
 # -------------------------------------THIS FUNCTION ROUNDS THE PREDICTION TO THE NEAREST WHOLE INTEGER--------------------------------------
 
 # note: change the function to return floating point numbers when the data recieved from the user is also a floating point number
 
-def make_custom_prediction(model, input_data):             
+def make_custom_prediction(model, input_data):
+    # Check if the input data contains any floats
+    contains_float = any(isinstance(x, float) for x in input_data)
     
+    # Convert input data to floats if contains_float is True
+    if contains_float:
+        input_data = [float(x) for x in input_data]
+    
+    # Convert input data to a NumPy array and reshape it for model input
     input_data = np.array(input_data).reshape((1, len(input_data), 1))
     
+    # Make prediction on the input data
     prediction = model.predict(input_data)
     
-    prediction_rounded = int(np.round(prediction))
-    
-    return prediction_rounded
-
-# ---------------------------------------------------------------------------
-
-#def make_custom_prediction(model, input_data):
-    
-    #input_data = np.array(input_data).reshape((1, len(input_data), 1))
-    
-    #prediction = model.predict(input_data)
-    
-    #return prediction[0][0]  # Return the raw predicted value
+    # Return the predicted value
+    if contains_float:
+        return float(prediction[0][0])  # Ensure float prediction is returned
+    else:
+        return int(np.round(prediction[0][0]))  # Return rounded integer prediction
 
 
-model = load_model("C:/Users/Administrator/func pred/function_prediction/models/my_model_v3.h5")
+model = load_model("models/model_float_v1.h5")
 
 x = 0
-original_points = a,b,c,d= 1,2,1,2 # these are the points the user sends in, given that the first point is 1
+original_points = a,b,c,d= sqrt(2),sqrt(3),sqrt(4),sqrt(5) # these are the points the user sends in, given that the first point is 1
 data_plot = [a,b,c,d]
 input_data = [a,b,c,d]
 x_values = [1,2,3,4]
