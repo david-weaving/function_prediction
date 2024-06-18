@@ -29,24 +29,24 @@ def make_custom_prediction(model, input_data):
         return int(np.round(prediction[0][0]))  # Return rounded integer prediction
 
 
-model = load_model("models/model_float_v1.h5")
+model = load_model("function_prediction/models/model_int_v2_1.h5")
 
 x = 0
-original_points = a,b,c,d= sqrt(2),sqrt(3),sqrt(4),sqrt(5) # these are the points the user sends in, given that the first point is 1
-data_plot = [a,b,c,d]
-input_data = [a,b,c,d]
-x_values = [1,2,3,4]
+original_points = a,b,c,d,e,f= 100,2,100,2,100,2 # these are the points the user sends in, given that the first point is 1
+data_plot = [a,b,c,d,e,f]
+input_data = [a,b,c,d,e,f]
+x_values = [1,2,3,4,5,6]
 
 while x != 50:
 
     data_plot.append(make_custom_prediction(model,input_data))
-    input_data = [data_plot[x+1], data_plot[x+2], data_plot[x+3], data_plot[x+4]]
+    input_data = [data_plot[x+1], data_plot[x+2], data_plot[x+3], data_plot[x+4], data_plot[x+5], data_plot[x+6]]
     x = x + 1
-    x_values.append(x+4)
+    x_values.append(x+6)
 
     
 print(data_plot) #predicted data
-x_values_original = [1,2,3,4]
+x_values_original = [1,2,3,4,5,6]
 
 #user input graph
 plt.plot(x_values_original, original_points, marker='o', linestyle='-')
