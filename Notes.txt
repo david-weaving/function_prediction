@@ -1,0 +1,25 @@
+
+6/15/24
+
+There are two seperate models, one to handle floating point numbers and one to handle integers.
+The model that handles integers will be used for polynomials and square waves
+The model that handles floats will be used for square roots, logs, and exponentials. In the future it will most likely handle sine waves as well.
+The models labeled combined were an attempt to combine both the models, for the time being, it did not go well -- the model interepreted everything as a quadratic. 
+
+Version 1 of the model handles 4 inputs and 1 output, version 2 will handle 6 inputs and 1 output (for both integer and float models).
+
+
+The integer model now takes 6 inputs and may need some further evaluation on either its model structure or batch size. Testing on batch size seems as if the model needs to be restructured.
+I trained the model v2 (integer) to a good point. It handles quadratics and square waves extremely well. Linear functions are okay but eventually seen as quadratic.
+I have hope this can be fixed through training on larger numbers.
+
+In the meantime I created a seperate script dedicated to randomly generating numbers for linear, quadratic, and alternating.
+
+I will train on additional data and figure out what happens from there.
+
+I pushed the training data to a seperate file to clean things up.
+
+The model is overfitting pretty badly and doing not great on unseen data.
+
+I'm closing up for the day, so far the model needs readjusting and I might be getting somewhere, maybe more training time? The original model is currently there but it's been #'d
+More data might be needed.
