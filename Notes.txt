@@ -23,3 +23,29 @@ The model is overfitting pretty badly and doing not great on unseen data.
 
 I'm closing up for the day, so far the model needs readjusting and I might be getting somewhere, maybe more training time? The original model is currently there but it's been #'d
 More data might be needed.
+
+06/18/24
+
+Must use tensorflow version 2.11.0 -- had an issue with importing models and went to upgrade tensorflow, did not work.
+
+Integer model is still overfitting, it is possible the validation data may be too complex.
+
+I am going to revaluate the whole system. Training data should have some continuation and then validation should have some
+'inbetween':
+
+training: [1,2,3,4,5,6] [7,8,9,10,11,12]
+validation: [5,6,7,8,9,10]
+
+Feeding in data very slowly seems to be key.
+
+I'm slowly training and it seems to be almost bending into place.
+
+The model is now working close to intended, I had to really drive home the difference between linear and quadratic,
+I just kept sending in the same data multiple times and it seemed to work.
+
+Start training on a new version (v2_4)
+
+06/27/24
+
+The entire project is going to go through a restructure. Instead of the model attempting to predict points, it will
+instead predict what type of function it is.

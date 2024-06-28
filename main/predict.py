@@ -1,5 +1,6 @@
 import numpy as np
 from tensorflow.keras.models import load_model
+from tensorflow.keras.optimizers import Adam
 import matplotlib.pyplot as plt
 from math import sqrt
 
@@ -29,10 +30,11 @@ def make_custom_prediction(model, input_data):
         return int(np.round(prediction[0][0]))  # Return rounded integer prediction
 
 
-model = load_model("function_prediction/models/model_int_v2_1.h5")
+model = load_model("models/model_int_v2_4.h5")
+model.compile(optimizer=Adam(), loss='mse')
 
 x = 0
-original_points = a,b,c,d,e,f= 100,2,100,2,100,2 # these are the points the user sends in, given that the first point is 1
+original_points = a,b,c,d,e,f= 700,8,27,701,125,700 # these are the points the user sends in, given that the first point is 1
 data_plot = [a,b,c,d,e,f]
 input_data = [a,b,c,d,e,f]
 x_values = [1,2,3,4,5,6]
