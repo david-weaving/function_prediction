@@ -2,19 +2,24 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from math import pow
+import func
 
 # ----------------------- THE CONTROL PANEL -----------------------  
 x = [3,18,2,25,35,41]  # x values from the user
 y = [1,5,8,15,25,40] # y values from the user
 
-# this snippet of code is to sort y while keeping all the x indicies aligned
-combined = list(zip(y, x))
-sorted_combined = sorted(combined, key=lambda z: z[0])
-y,x = zip(*sorted_combined)
+x = [-20,-10,0,10,22,30]
+y = [20,9,7,14,25,0]
 
 
-x_graph_limit_low = -5.5
-x_graph_limit_high = 2
+x,y = func.rearrange_arrays(x,y)  # reorders the array
+
+print(x)
+print(y)
+
+
+x_graph_limit_low = -10
+x_graph_limit_high = 1.2
 y_graph_limit_low = -5.5
 y_graph_limit_high = 1.6
 
@@ -31,6 +36,11 @@ def append_row(matrix, new_row):  # function to append rows into matrix
 n = 2 # degree of polynomial
 
 # ----- WIP: pulling the highest and lowest y values to push into matrix
+
+
+
+
+# ----------------------------------------------------------------------
 
 
 A = np.empty((0, n+1))
@@ -68,14 +78,6 @@ while i != n+1: # grabbing solutions ax^n + bx^n-1 + .....
     i=i+1
 
 
-# i=0     FOR ROUNDING, HOWEVER IT WONT WORK WITH CERTAIN POINTS.
-# while i != n+1:
-#     if abs(solutions[i]) < 0.01 and solutions[i] >= 0:
-#         solutions[i] = 0
-#     i=i+1
-
-
-# Check if values are less than 0.1, round them
 
 #print("Your function: ", solutions[0], "x^5 + ", solutions[1], "x^4 + ", solutions[2], "x^3 + ", solutions[3], "x^2 + ", solutions[4], "x + ", solutions[5])
 
@@ -103,8 +105,8 @@ plt.xlabel('X-axis')
 plt.ylabel('Y-axis')
 plt.title('User Points')
 plt.grid(True)
-plt.xlim(x_min*x_graph_limit_low, x_max*x_graph_limit_high) # for limits on the plots
-plt.ylim(y_min*y_graph_limit_low, y_max*y_graph_limit_high)
+plt.xlim(abs(x_min)*x_graph_limit_low, abs(x_max)*x_graph_limit_high) # for limits on the plots
+plt.ylim(abs(y_min)*y_graph_limit_low, abs(y_max)*y_graph_limit_high)
 plt.show()
 
 plt.figure(figsize=(8, 6))
@@ -114,8 +116,15 @@ plt.xlabel('X-axis')
 plt.ylabel('Y-axis')
 plt.title('Plotted Graph')
 plt.grid(True)
-plt.xlim(x_min*x_graph_limit_low, x_max*x_graph_limit_high) # for limits on the plots
-plt.ylim(y_min*y_graph_limit_low, y_max*y_graph_limit_high)
+plt.xlim(abs(x_min)*x_graph_limit_low, abs(x_max)*x_graph_limit_high) # for limits on the plots
+plt.ylim(abs(y_min)*y_graph_limit_low, abs(y_max)*y_graph_limit_high)
 plt.show()
 
+plt.figure(figsize=(8,6))
+plt.plot(x_n,y_n, color='red', label='New Graph',zorder=1)
+plt.xlabel('X-axis')
+plt.ylabel('Y-axis')
+plt.title('Full Graph')
+plt.grid(True)
+plt.show()
 # -------------------------------------------------------

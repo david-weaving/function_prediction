@@ -57,3 +57,9 @@ Model will be worked on once the algorithms are ready.
 
 
 Fix the incrementer (j) for moving 50 backwards, also adjust the view plot to see better
+
+
+6/29/24
+
+Need to work on STD function for bad points
+Need to work on dynamic print function
