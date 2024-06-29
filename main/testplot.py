@@ -3,14 +3,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 from math import pow
 
-# y = ax + b
+# ----------------------- THE CONTROL PANEL -----------------------  
+x = [3,18,22,25,35,41]  # x values from the user
+y = [1,5,8,15,25,40] # y values from the user
 
-# Define the matrices
+# x = [4,2,1,5,6]
+# y = [16,4,1,25,36]
 
-# np.matrix([[(x_1)^2, x_1, 1], [(x_2)^2, x_2, 1], [(x_3)^2, x_3, 1]])
+x_graph_limit_low = -5.5
+x_graph_limit_high = 2
+y_graph_limit_low = -260
+y_graph_limit_high = 1.6
 
-x = [-1.525,-1.037,0,0.508,0.844,1]
-y = [0,13.038,7,10.409,20.098,29]
+
+# -----------------------------------------------------------------
 
 
 def append_row(matrix, new_row):  # function to append rows into matrix
@@ -18,12 +24,16 @@ def append_row(matrix, new_row):  # function to append rows into matrix
 
 
 
-i = 1   # Outer while loop that appends the matrix
-n = 5  # degree of polynomial
+
+n = 2 # degree of polynomial
+
+
 
 A = np.empty((0, n+1))
 b = np.empty((0, 1))
 
+
+i = 1   # Outer while loop that appends the matrix
 while i != n+2:  # this while loop takes any degree polynomial and builds an n+1 x n+1 matrix (to solve system of equations, matrix of x's), along with returning the b vector (column of y)
     b = np.append(b, [[y[i-1]]], axis=0)
     row = []
@@ -38,67 +48,69 @@ while i != n+2:  # this while loop takes any degree polynomial and builds an n+1
     A = append_row(A, row)
     i += 1
 
-print(A)
-print(b)
+
 # Calculate the inverse of A
 A_inv = np.linalg.inv(A)
 
 result = A_inv @ b
 
-# Extract the coefficients
-#NOTE I can take a,b,c,d,...... and put them in  their own arrays and then use a loop to do math ect
-a = np.round(result[0, 0], decimals = 2)
-b = np.round(result[1, 0], decimals = 2)
-c = np.round(result[2, 0], decimals = 2)
-d = np.round(result[3,0],  decimals = 2)
-e = np.round(result[4,0],  decimals = 2)
-f = np.round(result[5,0],  decimals = 2)
 
-if a < 0.01 and a >= 0:
-    a = 0
-if b < 0.01 and b >= 0:
-    b = 0
-if c < 0.01 and c >= 0:
-    c = 0
-if d < 0.01 and d >= 0:
-    d = 0
-if e < 0.01 and e >= 0:
-    e = 0
-if f < 0.01 and f >= 0:
-    f = 0
+
+i=0
+solutions = []
+while i != n+1:
+    #solutions.append(np.round(result[i, 0], decimals = 2))
+    solutions.append(result[i, 0])
+    i=i+1
+
+
+# i=0     FOR ROUNDING, HOWEVER IT WONT WORK WITH CERTAIN POINTS.
+# while i != n+1:
+#     if abs(solutions[i]) < 0.01 and solutions[i] >= 0:
+#         solutions[i] = 0
+#     i=i+1
+
 
 # Check if values are less than 0.1, round them
 
-print("Your function: ", a, "x^5 + ", b, "x^4 + ", c, "x^3 + ", d, "x^2 + ", e, "x + ", f)
+#print("Your function: ", solutions[0], "x^5 + ", solutions[1], "x^4 + ", solutions[2], "x^3 + ", solutions[3], "x^2 + ", solutions[4], "x + ", solutions[5])
 
 
 
-x_n = x.copy()
-y_n = y.copy()
+x_n = np.linspace(x[0], x[5], 400) # create 400 points between x_1 and x_f
+x_forward = np.linspace(x[5]+0.1, 50, 400)
+x_backward = np.linspace(-50, x[0]-0.1, 400)
+x_n = np.append(x_n, x_forward)
+x_n = np.insert(x_n, 0, x_backward)
 
-i = 1
-while i < 50:   # 50 forward    ANOTHER NOTE: MAKE THIS AUTOMATIC TO SYNC UP WITH N (polynomial)
-    x_n.append(x[5] + i)
-    y_new = (a*x_n[5 + i]*x_n[5 + i]*x_n[5 + i]*x_n[5 + i]*x_n[5 + i]) + (b * x_n[5+i]*x_n[5+i]*x_n[5 + i]*x_n[5 + i]) + (c*x_n[5+i]*x_n[5+i]*x_n[5 + i]) + (d*x_n[5 + i]*x_n[5 + i]) + (e*x_n[5 + i]) + f
-    y_n.append(y_new)
-    i = i + 1
+# Compute the polynomial values for each x
+y_n = np.polyval(solutions, x_n)  #Plots any degree polynomial using A,B,C,D,E ... solutions
 
-i = 1
-j = -1
+# need to grab the highest and lowest x and y points 
+x_max = np.max(x)
+x_min = np.min(x)
+y_max = np.max(y)
+y_min = np.min(y)
 
-
-while i < 50:   # 50 backward
-  x_n = np.insert(x_n, 0, j)
-  y_new = (a*x_n[0]*x_n[0]*x_n[0]*x_n[0]*x_n[0]) + (b * x_n[0]*x_n[0]*x_n[0]*x_n[0]) + (c*x_n[0]*x_n[0]*x_n[0]) + (d*x_n[0]*x_n[0]) + (e*x_n[0]) + f
-  y_n = np.insert(y_n, 0, y_new)
-  i = i + 1
-  j = j - 1
-
-plt.plot(x, y)
+plt.figure(figsize=(8, 6))
+plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points',zorder=2)
+plt.xlabel('X-axis')
+plt.ylabel('Y-axis')
+plt.title('User Points')
+plt.grid(True)
+plt.xlim(x_min*x_graph_limit_low, x_max*x_graph_limit_high) # for limits on the plots
+plt.ylim(y_min*y_graph_limit_low, y_max*y_graph_limit_high)
 plt.show()
-plt.plot(x_n,y_n)
+
+plt.figure(figsize=(8, 6))
+plt.plot(x_n,y_n, color='red', label='New Graph',zorder=1)
+plt.scatter(x,y, color='blue', alpha=0.6, marker='o',zorder=2)
+plt.xlabel('X-axis')
+plt.ylabel('Y-axis')
+plt.title('Plotted Graph')
+plt.grid(True)
+plt.xlim(x_min*x_graph_limit_low, x_max*x_graph_limit_high) # for limits on the plots
+plt.ylim(y_min*y_graph_limit_low, y_max*y_graph_limit_high)
 plt.show()
 
-print(x_n)
-print(y_n)
 # -------------------------------------------------------
