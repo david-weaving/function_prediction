@@ -1,5 +1,6 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
+import itertools
 
 def rearrange_arrays(array1, array2):
     # Step 1: Combine and sort arrays
@@ -31,42 +32,78 @@ def rearrange_arrays(array1, array2):
     new_array2 = [index_highest, index_lowest, index_third_highest] + sorted_array2
     
     return new_array1, new_array2
+def append_row(matrix, new_row):  # function to append rows into matrix
+    return np.vstack([matrix, new_row])
+def average_graph(x,y,x_graph_limit_low,x_graph_limit_high,y_graph_limit_low,y_graph_limit_high,degree):
+
+    def fit_polynomial(x_points, y_points, degree):
+        A = np.vander(x_points, degree + 1) # this creates an a degree+1 x degree+1 matrix with powers of degree+1 decreasing through the row
+        b = np.array(y_points)
+        coeffs = np.linalg.lstsq(A, b, rcond=None)[0]  # clever way of solving the matrix, not as computationally heavy as inverse solving
+        return coeffs
+    
+    # Generate all combinations of degree+1 points out of 6
+    combinations = list(itertools.combinations(range(len(x)), degree+1))
+
+    # for plotting and populating x with more numbers
+    x_min = np.min(x)
+    x_max = np.max(x)
+    y_max = np.max(y)
+    y_min = np.min(y)
+    x_common = np.linspace(x_min, x_max, 400)
+
+    # continue the graph
+    x_forward = np.linspace(x_max+0.1, 50, 400)
+    x_backward = np.linspace(-50, x_min-0.1, 400)
+    x_common = np.append(x_common, x_forward)
+    x_common = np.insert(x_common, 0, x_backward)
 
 
+    all_y_values = []
+    for combo in combinations:
+        x_points = [x[i] for i in combo]
+        y_points = [y[i] for i in combo]
+        coeffs = fit_polynomial(x_points, y_points, degree)
+        y_values = np.polyval(coeffs, x_common)  # every possible polynomial
+        all_y_values.append(y_values) 
+
+    # average of all those polynomials
+    y_average = np.mean(all_y_values, axis=0)
+
+    #avg_coeffs = np.mean(np.array([fit_polynomial([x[i] for i in combo], [y[i] for i in combo], 2) for combo in combinations]), axis=0)
+    #print("Your function (average for x^2): ", np.round(avg_coeffs[0], decimals=5), "x^2 + ", np.round(avg_coeffs[1], decimals=5), "x + ", np.round(avg_coeffs[2], decimals=5))
+    
+
+    # Plotting
+    plt.figure(figsize=(8, 6))
+    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points',zorder=2)
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('User Points')
+    plt.grid(True)
+    plt.xlim(abs(x_min)*x_graph_limit_low, abs(x_max)*x_graph_limit_high) # for limits on the plots
+    plt.ylim(abs(y_min)*y_graph_limit_low, abs(y_max)*y_graph_limit_high)
+    plt.legend()
+    plt.show()
 
 
-# standard deviation
-# Given points
-x = np.array([3,18,2,25,35,41])
-y = np.array([1,5,8,15,25,40])
+    plt.figure(figsize=(8, 6))
+    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points',zorder=2)
+    plt.plot(x_common, y_average, color='red', label='Average Graph', zorder=1)
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('Averaged Graph')
+    plt.grid(True)
+    plt.xlim(abs(x_min)*x_graph_limit_low, abs(x_max)*x_graph_limit_high) # for limits on the plots
+    plt.ylim(abs(y_min)*y_graph_limit_low, abs(y_max)*y_graph_limit_high)
+    plt.legend()
+    plt.show()
 
-
-# Calculate the mean point
-mean_x = np.mean(x)
-mean_y = np.mean(y)
-
-# Calculate the distance of each point from the mean point
-distances = np.sqrt((x - mean_x)**2 + (y - mean_y)**2)
-
-# Calculate the mean distance
-mean_distance = np.mean(distances)
-
-# Calculate the standard deviation of the distances
-std_dev_distance = np.std(distances)
-
-# Tolerance factor (number of standard deviations considered acceptable)
-tolerance_factor = 1.1 # For example, 1.5 times the standard deviation
-
-# Determine the range within the specified tolerance factor
-lower_bound = mean_distance - tolerance_factor * std_dev_distance
-upper_bound = mean_distance + tolerance_factor * std_dev_distance
-
-# Check for outliers
-outliers = [(x[i], y[i]) for i in range(len(distances)) if distances[i] < lower_bound or distances[i] > upper_bound]
-
-print("Mean Point:", (mean_x, mean_y))
-print("Mean Distance:", mean_distance)
-print("Standard Deviation of Distances:", std_dev_distance)
-print(f"Range within {tolerance_factor} standard deviations:", (lower_bound, upper_bound))
-print("Outliers:", outliers)
-
+    plt.figure(figsize=(8, 6))
+    plt.plot(x_common, y_average, color='red', label='Average Graph',zorder=1)
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('Full Graph')
+    plt.grid(True)
+    plt.legend()
+    plt.show()
