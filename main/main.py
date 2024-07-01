@@ -1,38 +1,27 @@
-import math
 import numpy as np
 import matplotlib.pyplot as plt
 from math import pow
 import func
 import sys
 
-x = [3,18,2,25,35,41]  # x values from the user
-y = [1,5,8,15,25,40] # y values from the user
-
-
+x = [-15,-10,0,5,10,15]  # x values from the user
+y = [15,5,0,7,5,15] # y values from the user
 
 x_graph_limit_low = -10
 x_graph_limit_high = 1.2
 y_graph_limit_low = -5.5
 y_graph_limit_high = 1.6
 
-
-# -----------------------------------------------------------------
-
-
-
-
-
-
-
-n = 3 # degree of polynomial
-
+n = 2 # degree of polynomial
 
 func.average_graph(x,y,x_graph_limit_low,x_graph_limit_high,y_graph_limit_low,y_graph_limit_high,n)
 sys.exit()
 
-x,y = func.rearrange_arrays(x,y)  # reorders the array, used to grab the very first and very last x value for plotting, does not matter when finding average graphs
+
 
 # below is legacy code, for now it is unused but making a place for ----------------------------------------------------
+
+x,y = func.rearrange_arrays(x,y)  # reorders the array, used to grab the very first and very last x value for plotting, does not matter when finding average graphs
 
 A = np.empty((0, n+1))
 b = np.empty((0, 1))
