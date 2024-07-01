@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import itertools
+from scipy.optimize import curve_fit
 
 def rearrange_arrays(array1, array2):
     # Step 1: Combine and sort arrays
@@ -42,7 +43,7 @@ def average_graph(x,y,x_graph_limit_low,x_graph_limit_high,y_graph_limit_low,y_g
         coeffs = np.linalg.lstsq(A, b, rcond=None)[0]  # clever way of solving the matrix, not as computationally heavy as inverse solving
         return coeffs
     
-    # Generate all combinations of degree+1 points out of 6
+    # Generate all combinations of degree+1 points out of 6  -- (degree+1 because there are that many number of points)
     combinations = list(itertools.combinations(range(len(x)), degree+1))
 
     # for plotting and populating x with more numbers
@@ -74,7 +75,7 @@ def average_graph(x,y,x_graph_limit_low,x_graph_limit_high,y_graph_limit_low,y_g
     #print("Your function (average for x^2): ", np.round(avg_coeffs[0], decimals=5), "x^2 + ", np.round(avg_coeffs[1], decimals=5), "x + ", np.round(avg_coeffs[2], decimals=5))
     
 
-    # Plotting
+    # plotting
     plt.figure(figsize=(8, 6))
     plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points',zorder=2)
     plt.xlabel('X-axis')
@@ -107,3 +108,7 @@ def average_graph(x,y,x_graph_limit_low,x_graph_limit_high,y_graph_limit_low,y_g
     plt.grid(True)
     plt.legend()
     plt.show()
+
+
+def exp_average(x,y,x_graph_limit_low,x_graph_limit_high,y_graph_limit_low,y_graph_limit_high):
+    print('WIP')
