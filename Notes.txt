@@ -63,3 +63,10 @@ Fix the incrementer (j) for moving 50 backwards, also adjust the view plot to se
 
 Need to work on STD function for bad points
 Need to work on dynamic print function
+
+7/1/24
+
+Fix plotting by making the bounds more consistent. Do an aboslute value comparison of
+the max and mins for both, take the highest and make those the bounds.
+
+Use standard deviation for exp function, it's crucial to remove bad points
