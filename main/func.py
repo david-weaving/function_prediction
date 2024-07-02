@@ -33,9 +33,13 @@ def rearrange_arrays(array1, array2):
     new_array2 = [index_highest, index_lowest, index_third_highest] + sorted_array2
     
     return new_array1, new_array2
+
+
 def append_row(matrix, new_row):  # function to append rows into matrix
     return np.vstack([matrix, new_row])
-def average_graph(x,y,x_graph_limit_low,x_graph_limit_high,y_graph_limit_low,y_graph_limit_high,degree):
+
+
+def poly_avgerage(x,y,degree):
 
     def fit_polynomial(x_points, y_points, degree):
         A = np.vander(x_points, degree + 1) # this creates an a degree+1 x degree+1 matrix with powers of degree+1 decreasing through the row
@@ -71,37 +75,70 @@ def average_graph(x,y,x_graph_limit_low,x_graph_limit_high,y_graph_limit_low,y_g
     # average of all those polynomials
     y_average = np.mean(all_y_values, axis=0)
 
-    #avg_coeffs = np.mean(np.array([fit_polynomial([x[i] for i in combo], [y[i] for i in combo], 2) for combo in combinations]), axis=0)
-    #print("Your function (average for x^2): ", np.round(avg_coeffs[0], decimals=5), "x^2 + ", np.round(avg_coeffs[1], decimals=5), "x + ", np.round(avg_coeffs[2], decimals=5))
+    avg_coeffs = np.mean(np.array([fit_polynomial([x[i] for i in combo], [y[i] for i in combo], degree) for combo in combinations]), axis=0)
     
+    p = len(avg_coeffs) - 1
+
+    # for printing polynomial
+    print("Average Polynomial: ")
+    for coeff in avg_coeffs:
+        if p > 1:
+            print(f"{coeff}x^{p} + ", end="")
+        elif p == 1:
+            print(f"{coeff}x + ", end="")
+        else:
+            print(f"{coeff}", end="")
+        p -= 1
+
+    print("\b\b")
+
+    if abs(x_min) > abs(x_max):
+        x_limit = abs(x_min) * 3
+    else:
+        x_limit = abs(x_max) * 3
+
+    if abs(y_min) > abs(y_max):
+        y_limit = abs(y_min) * 3
+    else:
+        y_limit = abs(y_max) * 3    
 
     # plotting
+
+    # Adjusting plot limits dynamically
+    x_margin = (x_max - x_min) * 0.1
+    y_margin = (y_max - y_min) * 0.1
+
+    x_plot_min = x_min - x_margin
+    x_plot_max = x_max + x_margin
+    y_plot_min = y_min - y_margin
+    y_plot_max = y_max + y_margin
+
     plt.figure(figsize=(8, 6))
     plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points',zorder=2)
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
     plt.title('User Points')
     plt.grid(True)
-    plt.xlim(abs(x_min)*x_graph_limit_low, abs(x_max)*x_graph_limit_high) # for limits on the plots
-    plt.ylim(abs(y_min)*y_graph_limit_low, abs(y_max)*y_graph_limit_high)
+    plt.xlim(x_plot_min, x_plot_max) # for limits on the plots
+    plt.ylim(y_plot_min, y_plot_max)
     plt.legend()
     plt.show()
 
-
+    # Plotting
     plt.figure(figsize=(8, 6))
-    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points',zorder=2)
+    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points', zorder=2)
     plt.plot(x_common, y_average, color='red', label='Average Graph', zorder=1)
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
     plt.title('Averaged Graph')
     plt.grid(True)
-    plt.xlim(abs(x_min)*x_graph_limit_low, abs(x_max)*x_graph_limit_high) # for limits on the plots
-    plt.ylim(abs(y_min)*y_graph_limit_low, abs(y_max)*y_graph_limit_high)
+    plt.xlim(x_plot_min, x_plot_max)
+    plt.ylim(y_plot_min, y_plot_max)
     plt.legend()
     plt.show()
 
     plt.figure(figsize=(8, 6))
-    plt.plot(x_common, y_average, color='red', label='Average Graph',zorder=1)
+    plt.plot(x_common, y_average, color='red', label='Average Graph', zorder=1)
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
     plt.title('Full Graph')
@@ -110,5 +147,94 @@ def average_graph(x,y,x_graph_limit_low,x_graph_limit_high,y_graph_limit_low,y_g
     plt.show()
 
 
-def exp_average(x,y,x_graph_limit_low,x_graph_limit_high,y_graph_limit_low,y_graph_limit_high):
-    print('WIP')
+def exp_average(x,y):
+    # Define the exponential model fitting function
+    def fit_exp(x_points, y_points):
+        def exp_model(x, A, b, C):
+            return A * np.exp(b * x) + C
+        
+        # Improved initial guess for parameters A, b, and C
+        A_guess = (y_points[-1] - y_points[0]) / (np.exp(x_points[-1]) - np.exp(x_points[0]))
+        b_guess = np.log(y_points[-1] / y_points[0]) / (x_points[-1] - x_points[0])
+        C_guess = y_points[0] - A_guess * np.exp(b_guess * x_points[0])
+        
+        initial_guess = [A_guess, b_guess, C_guess]
+        
+        # Fit the model to the points
+        params, _ = curve_fit(exp_model, x_points, y_points, p0=initial_guess)
+        return params
+
+    # Define the exponential value evaluation function
+    def expval(A, b, C, x_common):
+        return A * np.exp(b * x_common) + C
+
+    x_min = np.min(x)
+    x_max = np.max(x)
+    y_max = np.max(y)
+    y_min = np.min(y)
+
+    # Generate all combinations of three points
+    combinations = list(itertools.combinations(range(len(x)), 3))
+
+    all_y_values = []
+    x_common = np.linspace(x_min, x_max, 400)
+
+    # Iterate over all combinations, fit the model, and evaluate it
+    for combo in combinations:
+        x_points = [x[i] for i in combo]
+        y_points = [y[i] for i in combo]
+        
+        try:
+            A, b, C = fit_exp(x_points, y_points)
+            y_values = expval(A, b, C, x_common)
+            all_y_values.append(y_values)
+        except RuntimeError as e:
+            print(f"Error fitting combination {combo}: {e}")
+
+    # Compute the average y-values
+    all_y_values = np.array(all_y_values)
+    y_average = np.mean(all_y_values, axis=0)
+
+
+    # Plotting
+
+    # Adjusting plot limits dynamically
+    x_margin = (x_max - x_min) * 0.1
+    y_margin = (y_max - y_min) * 0.1
+
+    x_plot_min = x_min - x_margin
+    x_plot_max = x_max + x_margin
+    y_plot_min = y_min - y_margin
+    y_plot_max = y_max + y_margin
+
+    plt.figure(figsize=(8, 6))
+    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points',zorder=2)
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('User Points')
+    plt.grid(True)
+    plt.xlim(x_plot_min, x_plot_max) # for limits on the plots
+    plt.ylim(y_plot_min, y_plot_max)
+    plt.legend()
+    plt.show()
+
+    plt.figure(figsize=(8, 6))
+    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points', zorder=2)
+    plt.plot(x_common, y_average, color='red', label='Average Graph', zorder=1)
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('Averaged Graph')
+    plt.grid(True)
+    plt.xlim(x_plot_min, x_plot_max)
+    plt.ylim(y_plot_min, y_plot_max)
+    plt.legend()
+    plt.show()
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(x_common, y_average, color='red', label='Average Graph', zorder=1)
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('Full Graph')
+    plt.grid(True)
+    plt.legend()
+    plt.show()
