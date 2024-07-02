@@ -48,8 +48,8 @@ def poly_avgerage(x,y,degree):
         return coeffs
     
     # Generate all combinations of degree+1 points out of 6  -- (degree+1 because there are that many number of points)
-    combinations = list(itertools.combinations(range(len(x)), degree+1))
-
+    combinations = list(itertools.combinations(range(len(x)), len(x))) # range takes in number of indicies and len(x) takes in number of combinations among those numbers
+ 
     # for plotting and populating x with more numbers
     x_min = np.min(x)
     x_max = np.max(x)
@@ -63,7 +63,7 @@ def poly_avgerage(x,y,degree):
     x_common = np.append(x_common, x_forward)
     x_common = np.insert(x_common, 0, x_backward)
 
-
+    # NOTE THIS FOR LOOP CAN BE REMOVED AND x_points and y_points CAN BE REPLACED WITH JUST x and y, PLEASE TEST FURTHER BEFORE DOING SO
     all_y_values = []
     for combo in combinations:
         x_points = [x[i] for i in combo]
@@ -174,7 +174,7 @@ def exp_average(x,y):
     y_min = np.min(y)
 
     # Generate all combinations of three points
-    combinations = list(itertools.combinations(range(len(x)), 3))
+    combinations = list(itertools.combinations(range(len(x)), len(x)))
 
     all_y_values = []
     x_common = np.linspace(x_min, x_max, 400)
