@@ -70,3 +70,5 @@ Fix plotting by making the bounds more consistent. Do an aboslute value comparis
 the max and mins for both, take the highest and make those the bounds.
 
 Use standard deviation for exp function, it's crucial to remove bad points
+
+I've been making things way too hard: we just needed to average the points NOT every combination of points
