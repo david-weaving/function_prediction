@@ -46,9 +46,6 @@ def poly_avgerage(x,y,degree):
         b = np.array(y_points)
         coeffs = np.linalg.lstsq(A, b, rcond=None)[0]  # clever way of solving the matrix, not as computationally heavy as inverse solving
         return coeffs
-    
-    # Generate all combinations of degree+1 points out of 6  -- (degree+1 because there are that many number of points)
-    combinations = list(itertools.combinations(range(len(x)), len(x))) # range takes in number of indicies and len(x) takes in number of combinations among those numbers
  
     # for plotting and populating x with more numbers
     x_min = np.min(x)
@@ -94,7 +91,7 @@ def poly_avgerage(x,y,degree):
     plt.plot(x_common,   y_values, color='red', label='Average Graph', zorder=1)
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
-    plt.title('Averaged Graph')
+    plt.title('Polynomial Fitting')
     plt.grid(True)
     plt.xlim(x_plot_min, x_plot_max)
     plt.ylim(y_plot_min, y_plot_max)
@@ -105,7 +102,7 @@ def poly_avgerage(x,y,degree):
     plt.plot(x_common,  y_values, color='red', label='Average Graph', zorder=1)
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
-    plt.title('Full Graph')
+    plt.title('Polynomial Fitting (Full Graph)')
     plt.grid(True)
     plt.legend()
     plt.show()
@@ -139,7 +136,10 @@ def exp_average(x, y):
         return
 
     A_fit, b_fit, C_fit = params
-    print(f"Fit parameters: A = {A_fit}, b = {b_fit}, C = {C_fit}")
+    if C_fit > 0 or C_fit == 0:
+        print(f"Exp Function: y = {A_fit} + e^{b_fit}x + {C_fit}")
+    else:
+        print(f"Exp Function: y = {A_fit} + e^{b_fit}x - {abs(C_fit)}")
 
     # create our function
     x_common = np.linspace(np.min(x), np.max(x), 400)
