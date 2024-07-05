@@ -76,3 +76,7 @@ I've been making things way too hard: we just needed to average the points NOT e
 7/5/24
 
 Fixed the exponential function by allowing better initial guesses along with better guesses for decaying functions
+
+Some fixes not noted here: Better graphing fix, combinations removed as well as averaging, math testing script created to mess around with math before implementation.
+
+Will start on the next algorithm before creating the AI model.
