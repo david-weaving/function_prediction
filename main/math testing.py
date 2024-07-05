@@ -1,87 +1,84 @@
+
+# this mess is purely a playground for math related things and testing specific functions
+
+
 import numpy as np
-import itertools
-from scipy.optimize import curve_fit
+from scipy.optimize import least_squares
 import matplotlib.pyplot as plt
+from math import pi
+import cmath
+from scipy.optimize import curve_fit
+from sys import exit
 
-# Define the exponential model fitting function
-def fit_exp(x_points, y_points):
-    def exp_model(x, A, b, c, E, C):
-        return A * b ** (c * x + E) + C
-    
-    # Initial guess for parameters A, b, c, E, and C
-    A_guess = (y_points[-1] - y_points[0]) / (np.exp(x_points[-1]) - np.exp(x_points[0]))
-    b_guess = np.exp(np.log(y_points[-1] / y_points[0]) / (x_points[-1] - x_points[0]))
-    c_guess = 1.0
-    E_guess = 0.0
-    C_guess = y_points[0] - A_guess * b_guess ** (c_guess * x_points[0] + E_guess)
-    
-    initial_guess = [A_guess, b_guess, c_guess, E_guess, C_guess]
-    
-    # Fit the model to the points
-    params, _ = curve_fit(exp_model, x_points, y_points, p0=initial_guess)
-    return params
 
-# Define the exponential value evaluation function
-def expval(A, b, c, E, C, x_common):
-    return A * b ** (c * x_common + E) + C
+x=[-2,-1,0,1,2,4]
+y=[7.4,2.72,1,0.37,0.14,0.02]
 
-# Sample data points
-x = np.array([-4.2, -3.5, -2.8, -1.6, -0.9, 0.0, 1.2, 2.3, 3.4, 4.7])
-y = np.array([0.5, 1.1, 2.3, 4.7, 9.2, 15.0, 27.5, 50.3, 91.8, 168.4])
 
-x_min = np.min(x)
-x_max = np.max(x)
-y_max = np.max(y)
-y_min = np.min(y)
+x = [-5.0, -3.0, -1.0]
+y = [148, 20.4, 2.9]
 
-# Generate all combinations of six points
-combinations = list(itertools.combinations(range(len(x)), 6))
+x = [-2,-1.3,0,2]
+y = [4,2.6,1.5,1]
 
-all_y_values = []
-x_common = np.linspace(x_min, x_max, 400)
+x = [-2,-1.01,0]
+y=[4,0,-2]
 
-# Iterate over all combinations, fit the model, and evaluate it
-for combo in combinations:
-    x_points = [x[i] for i in combo]
-    y_points = [y[i] for i in combo]
-    
+
+
+# new code seems to work for both decay and growth with a better fitting for guesses
+def exp_average(x, y):
+    # Define the exponential model fitting function
+    def exp_model(x, A, b, C):
+        return A * np.exp(b * x) + C
+
+    # Initial guess for parameters
+    def initial_guess(x_points, y_points):
+        A_guess = (np.max(y_points) - np.min(y_points)) / (np.exp(np.max(x_points)) - np.exp(np.min(x_points)))
+        
+        try:
+            b_guess = np.log(y_points[-1] / y_points[0]) / (x_points[-1] - x_points[0])
+            if np.isnan(b_guess):
+                b_guess = 0.1  # Default guess for b if logarithm calculation fails
+        except ValueError:
+            b_guess = 0.1  # Default guess for b if logarithm calculation fails
+        
+        C_guess = np.min(y_points)  # Initialize C_guess based on the minimum y-value
+        
+        return [A_guess, b_guess, C_guess]
+
+    # Fit the model to the data
     try:
-        A, b, c, E, C = fit_exp(x_points, y_points)
-        y_values = expval(A, b, c, E, C, x_common)
-        all_y_values.append(y_values)
+        params, _ = curve_fit(exp_model, x, y, p0=initial_guess(x, y), maxfev=2000)
     except RuntimeError as e:
-        print(f"Error fitting combination {combo}: {e}")
+        print(f"Error fitting data: {e}")
+        return
 
-# Compute the average y-values
-all_y_values = np.array(all_y_values)
-y_average = np.mean(all_y_values, axis=0)
+    A_fit, b_fit, C_fit = params
+    print(f"Fit parameters: A = {A_fit}, b = {b_fit}, C = {C_fit}")
 
-# Plotting
-x_margin = (x_max - x_min) * 0.1
-y_margin = (y_max - y_min) * 0.1
+    # Generate model values for plotting
+    x_common = np.linspace(np.min(x), np.max(x), 400)
+    y_fit = exp_model(x_common, A_fit, b_fit, C_fit)
 
-x_plot_min = x_min - x_margin
-x_plot_max = x_max + x_margin
-y_plot_min = y_min - y_margin
-y_plot_max = y_max + y_margin
+    # Plotting
 
-plt.figure(figsize=(8, 6))
-plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points', zorder=2)
-plt.plot(x_common, y_average, color='red', label='Average Graph', zorder=1)
-plt.xlabel('X-axis')
-plt.ylabel('Y-axis')
-plt.title('Averaged Graph')
-plt.grid(True)
-plt.xlim(x_plot_min, x_plot_max)
-plt.ylim(y_plot_min, y_plot_max)
-plt.legend()
-plt.show()
 
-plt.figure(figsize=(8, 6))
-plt.plot(x_common, y_average, color='red', label='Average Graph', zorder=1)
-plt.xlabel('X-axis')
-plt.ylabel('Y-axis')
-plt.title('Full Graph')
-plt.grid(True)
-plt.legend()
-plt.show()
+    plt.figure(figsize=(8, 6))
+    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Data Points')
+    plt.plot(x_common, y_fit, color='red', label='Fitted Curve')
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('Exponential Curve Fitting')
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
+
+# Example usage:
+# x = [0.1, 0.2, 0.3, 0.45, 0.7]
+# y = [0.37, 0.14, 0.05, 0.01, 0.0009]
+exp_average(x, y)
+
+
+
