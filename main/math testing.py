@@ -55,7 +55,10 @@ def exp_average(x, y):
         return
 
     A_fit, b_fit, C_fit = params
-    print(f"Fit parameters: A = {A_fit}, b = {b_fit}, C = {C_fit}")
+    if C_fit > 0 or C_fit == 0:
+        print(f"Exp Function: y = {A_fit} + e^{b_fit}x + {C_fit}")
+    else:
+        print(f"Exp Function: y = {A_fit} + e^{b_fit}x - {abs(C_fit)}")
 
     # Generate model values for plotting
     x_common = np.linspace(np.min(x), np.max(x), 400)
