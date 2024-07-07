@@ -34,10 +34,8 @@ def rearrange_arrays(array1, array2):
     
     return new_array1, new_array2
 
-
 def append_row(matrix, new_row):  # function to append rows into matrix
     return np.vstack([matrix, new_row])
-
 
 def poly_avgerage(x,y,degree):
 
