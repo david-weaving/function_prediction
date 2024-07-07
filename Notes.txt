@@ -80,3 +80,17 @@ Fixed the exponential function by allowing better initial guesses along with bet
 Some fixes not noted here: Better graphing fix, combinations removed as well as averaging, math testing script created to mess around with math before implementation.
 
 Will start on the next algorithm before creating the AI model.
+
+The SINE algorithm is done, and works much better than the exponential algorithm, it handles noisy data fairly well
+
+Starting on the model soon. Hopefully the website starting in a bit.
+
+Two seperate models; one for predicting function type and the other for polynomial degree
+
+7/6/24
+
+using sklearn may be better than tensorflow
+
+training is going well, predictions are fairly well iwth unseen data
+
+the newest model is well, will test more points and start putting sines in soon
