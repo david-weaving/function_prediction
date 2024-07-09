@@ -1,42 +1,23 @@
 import numpy as np
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
+from data import x_train, y_train
 
-# Example data (adjust according to your dataset)
-x_train = np.array([[(1,1),(2,2),(3,3),(4,4),(5,5),(6,6)], 
-                    [(1,1),(2,4),(3,9),(4,16),(5,25),(6,36)], 
-                    [(0,1.5),(1,1.822),(2,2.203),(3,2.654),(4,3.193),(5,3.848)],[(1, 2.718), (2, 7.389), (3, 20.085), (4, 54.598), (5, 148.413), (6, 403.429)],
-                    [(1, 6), (2, 15), (3, 28), (4, 45), (5, 66), (6, 91)],[(1, 1), (2, 8), (3, 27), (4, 64), (5, 125), (6, 216)],[(1, 3), (2, 9), (3, 27), (4, 81), (5, 243), (6, 729)],
-                    [(1, 2.5), (2, 6.25), (3, 15.625), (4, 39.0625), (5, 97.65625), (6, 244.140625)],[(1, 2), (2, 5), (3, 10), (4, 17), (5, 26), (6, 37)],
-                    [(1, 2), (2, 4), (3, 6), (4, 8), (5, 10), (6, 12)],[(1, 3), (2, 6), (3, 9), (4, 12), (5, 15), (6, 18)],[(1, 3), (2, 7), (3, 11), (4, 15), (5, 19), (6, 23)],
-                    [(1, 2.5), (2, 6.2), (3, 15.1), (4, 37.2), (5, 91.0), (6, 223.1)],[(1, 1.5), (2, 4.2), (3, 9.7), (4, 17.8), (5, 28.5), (6, 42.3)],
-                    [(1, 1.5), (2, 4.2), (3, 9.7), (4, 17.8), (5, 28.5), (6, 42.3)],[(1, 1), (2, 3.2), (3, 5.4), (4, 7.6), (5, 9.8), (6, 12)],
-                    [(1, 2.718), (2, 7.389), (3, 20.085), (4, 54.598), (5, 148.413), (6, 403.429)],[(2,2),(3,3),(4,4),(5,5),(6,6),(7,7)],
-                    [(2,4),(3,9),(4,16),(5,25),(6,36),(7,49)],[(1, 1.5), (2, 2.25), (3, 3.375), (4, 5.0625), (5, 7.59375), (6, 11.390625)],[(1, 3), (2, 9), (3, 27), (4, 81), (5, 243), (6, 729)],
-                    [(10, 4), (11, 9), (12, 16), (13, 25),(14,36),(15,49)],[(-4, 0.5), (-3.5, 1.1), (-2.8, 2.3), (-1.6, 4.7), (-0.9, 9.2), (0.0, 15.0)],
-                    [(-3.5, 1.1), (-2.8, 2.3), (-1.6, 4.7), (-0.9, 9.2), (0.0, 15.0), (1.2, 27.5)],[(-4, -7), (-3.5, -6.75), (-2.8, -5.6), (-1.6, -3.2), (-0.9, -1.8), (0.0, -1.0)],
-                    [(-4, 10), (-3.5, 6.75), (-2.8, 4.68), (-1.6, 1.6), (-0.9, 0.21), (0.0, -0.5)],[(-4, 54.598), (-3.5, 33.115), (-2.8, 16.438), (-1.6, 5.332), (-0.9, 2.459), (0.0, 1.0)],
-                    [(1, 4.0), (2, 2.5), (3, 1.7), (4, 1.1), (5, 0.7), (6, 0.5)],[(-6, 0.015625), (-5, 0.03125), (-4, 0.0625), (-3, 0.125), (-2, 0.25), (-1, 0.5)],
-                    [(-3, 5), (-2, 8.5), (-1, 2.3), (0, 1.8), (1, 1), (2, 2.5)],[(5, 7), (6, 9.5), (7, 12), (8, 14.5), (9, 17), (10, 19.5)],[(5, 125), (6, 216), (7, 343), (8, 512), (9, 729), (10, 1000)],
-                    [(10, 100), (11, 121), (12, 144), (13, 169), (14, 196), (15, 225)],[(-3, 47), (-2, 30), (-1, 13), (0, 2), (1, 3), (2, 14)],
-                    [(-3, 47), (-1.5, 16.75), (0, 2), (1.5, 10.25), (3, 35), (4.5, 76.25)],[(-5, -16), (-2, -7), (0, -1), (3, 8), (6, 17), (8, 23)],
-                    [(1.2, 2.4484), (4.8, 0.1477), (3.3, 0.3885), (7.1, 0.0278), (2.5, 0.6839), (6.4, 0.0541)],[(1.1, 5.5972), (2.3, 11.0365), (3.5, 21.7143), (4.7, 42.9508), (5.9, 84.5274), (7.1, 165.298)],
-                    [(1,1),(2,8),(3,27),(4,64),(5,125),(6,216)],[(7.2, 373.248), (7.5, 421.875), (8.0, 512.0), (8.5, 614.125), (9.0, 729.0), (9.5, 857.375)],
-                    [(0, 0.0), (1, 0.84), (2, 0.91), (3, 0.14), (4, -0.76), (5, -0.99)],[(1.2, 0.93), (2.5, 0.60), (3.7, -0.53), (5.1, -0.93), (6.4, 0.11), (7.6, 0.99)],
-                    [(8, 0.99), (9.3, 0.10), (10.7, -0.98), (12, -0.54), (13.5, 0.39), (15, 0.65)],[(2, 0.91), (3, 0.14), (4, -0.76), (5, -0.99), (6, -0.28), (7, 0.66)],
-                    [(-2, -0.91), (-3, -0.14), (-4, 0.76), (-5, 0.99), (-6, 0.28), (-7, -0.66)],[(-2, 4.09), (-3, 4.84), (-4, 4.37), (-5, 2.82), (-6, 1.14), (-7, 2.47)],
-                    [(1, 4.61), (2, 4.99), (3, 2.91), (4, 0.92), (5, 1.99), (6, 3.92)],[(1, 2.38), (2, 2.97), (3, 1.71), (4, 0.48), (5, 1.54), (6, 2.81)],
-                    [(-9, 0.93), (-8, 1.72), (-7, 3.61), (-6, 4.83), (-5, 4.09), (-4, 2.49)],[(8, 3.06), (9, 3.69), (10, 3.24), (11, 1.59), (12, 0.96), (13, 1.89)],
-                    [(-3, 40), (-1, 7), (0, 2), (2, 1), (3, 4), (5, 82)],[(-3, -38), (-1, -2), (1, 4), (2, 16), (4, 86), (5, 163)],
-                    [(0, 2), (2, 18), (3, 42), (5, 142), (7, 306), (9, 554)],[(1, 4), (3, 18), (5, 54), (7, 122), (9, 228), (11, 378)],
-                    [(1, -2), (2, 5), (3, 32), (4, 109), (5, 278), (6, 575)],[(0, 1), (1, 0), (2, 1), (3, 4), (4, 9), (5, 16)],[(0, 0.0), (1, 1.68), (2, 2.95), (3, 3.61), (4, 3.54), (5, 2.81)],
-                    ])
-y_train = np.array([["polynomial"], ["polynomial"], ["exponential"],["exponential"],["polynomial"],["polynomial"],["exponential"],["exponential"],["polynomial"],
-                    ["polynomial"],["polynomial"], ["polynomial"],["exponential"],["polynomial"],["polynomial"],["polynomial"],["exponential"],["polynomial"],["polynomial"],
-                    ["exponential"],["exponential"],["polynomial"],["exponential"],["exponential"],["polynomial"],["polynomial"],["exponential"],["exponential"],
-                    ["exponential"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["exponential"],["exponential"],
-                    ["polynomial"],["polynomial"],["sine"],["sine"],["sine"],["sine"],["sine"],["sine"],["sine"],["sine"],["sine"],["sine"],["polynomial"],
-                    ["polynomial"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["sine"]])
+print(np.size(x_train,0))
+print(np.size(y_train))
+p=0
+k=0
+j=0
+
+for i in y_train:
+    if i == "polynomial":
+        p=p+1
+    if i == "exponential":
+        k=k+1
+    if i == "sine":
+        j=j+1
+print(f'Exponentials: {k}, Poly: {p}, Sine: {j}')
+exit()
 
 
 # Encode labels
@@ -49,10 +30,11 @@ x_train_reshaped = x_train.reshape((len(y_train), 6, 2))
 
 # Split data into training and validation sets
 x_train_split, x_val_split, y_train_split, y_val_split = train_test_split(
-    x_train_reshaped, y_train_encoded, test_size=0.2, random_state=12) # 10 is good
+    x_train_reshaped, y_train_encoded, test_size=0.2, random_state=10) # 10 is good
 
 # print(y_val_split)
 # exit()
+
 # Define and train the model
 model = tf.keras.models.Sequential([
     tf.keras.layers.Dense(64, activation='relu', input_shape=(6, 2)),
@@ -65,20 +47,20 @@ model.compile(optimizer='adam',
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
 
-batch_size=1
+batch_size=2
 steps_per_epoch = len(x_train_reshaped) // batch_size  # Batch size is 1, so we use the whole dataset in each epoch
 
 # Train the model with validation data
 history = model.fit(x_train_reshaped, y_train_encoded, 
                     validation_data=(x_val_split, y_val_split),
-                    epochs=35, batch_size=batch_size, steps_per_epoch=steps_per_epoch)
+                    epochs=50, batch_size=batch_size, steps_per_epoch=steps_per_epoch)
 
 # Evaluate model performance on validation data
 val_loss, val_acc = model.evaluate(x_val_split, y_val_split)
 print(f"Validation accuracy: {val_acc}")
 
 # Save the model
-model.save("models/model_V1.h5")
+model.save("function_prediction/models/model_V1.h5")
 
 def predict_function_type(points, model):
     points_reshaped = np.array([points])  # Reshape to fit model input shape
