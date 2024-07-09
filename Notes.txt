@@ -91,7 +91,9 @@ Two seperate models; one for predicting function type and the other for polynomi
 
 using sklearn may be better than tensorflow
 
-training is going well, predictions are fairly well iwth unseen data
+7/8/24
+
+training is going well, predictions are fairly well with unseen data
 
 the newest model is well, will test more points and start putting sines in soon
 
