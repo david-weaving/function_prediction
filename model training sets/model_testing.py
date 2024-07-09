@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 # Load the saved model
-model = tf.keras.models.load_model("models/model_V1.h5")
+model = tf.keras.models.load_model("function_prediction/models/model_V1.h5")
 
 # Function to predict function type based on points
 def predict_function_type(points, model):
