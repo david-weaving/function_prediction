@@ -19,6 +19,6 @@ def predict_function_type(points, model):
         return "sine"
 
 # Example usage
-new_points =  [(-4, 0.5), (-3.5, 1.1), (-2.8, 2.3), (-1.6, 4.7), (-0.9, 9.2), (0.0, 15.0)]
+new_points = [(-3, 40), (-1, 7), (0, 2), (2, 1), (3, 4), (5, 82)]
 predicted_type = predict_function_type(new_points, model)
 print("Predicted function type:", predicted_type)
