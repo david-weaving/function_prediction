@@ -294,7 +294,7 @@ def sine_average(x, y):
 
 def predict_function(x,y): # predicts funtion
         
-    model = tf.keras.models.load_model("models/model_V1.h5")
+    model = tf.keras.models.load_model("function_prediction/models/model_V1.h5")
 
     points = list(zip(x, y))
     print(points)
