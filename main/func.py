@@ -2,6 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import itertools
 from scipy.optimize import curve_fit
+import tensorflow as tf
+
+
 
 def rearrange_arrays(array1, array2):
     # Step 1: Combine and sort arrays
@@ -288,3 +291,28 @@ def sine_average(x, y):
     plt.grid(True)
     plt.legend()
     plt.show()
+
+def predict_function(x,y): # predicts funtion
+        
+    model = tf.keras.models.load_model("models/model_V1.h5")
+
+    points = list(zip(x, y))
+    print(points)
+
+    predicted_type = predict_function_type(points, model)
+    return predicted_type
+    
+def predict_function_type(points, model): # returns function type
+
+    points_reshaped = np.array([points])  # Reshape to fit model input shape
+    prediction = model.predict(points_reshaped)
+    predicted_class = np.argmax(prediction)  # Get index of highest probability
+    if predicted_class == 0:
+        return "linear"
+    elif predicted_class == 1:
+        return "polynomial"
+    elif predicted_class == 2:
+        return "exponential"
+    elif predicted_class == 3:
+        return "sine"
+    
