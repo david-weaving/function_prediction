@@ -50,7 +50,7 @@ Start training on a new version (v2_4)
 The entire project is going to go through a restructure. Instead of the model attempting to predict points, it will
 instead predict what type of function it is.
 
-Huge overall. We are now using an algorithm to precisely predict the function. The model, now named FELPS-P1.0, will predict the kind of function
+Huge overhaul. We are now using an algorithm to precisely predict the function. The model, now named FELPS-P1.0, will predict the kind of function
 (ex: polynomial) and return the degree (iff it's a polynomial)
 
 Model will be worked on once the algorithms are ready.
