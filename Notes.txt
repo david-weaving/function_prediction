@@ -94,3 +94,5 @@ using sklearn may be better than tensorflow
 training is going well, predictions are fairly well iwth unseen data
 
 the newest model is well, will test more points and start putting sines in soon
+
+Model, named "FELPS-P1.0" is doing extremely well. More data will be tested and improved on. Logs and square roots will be introduced soon.
