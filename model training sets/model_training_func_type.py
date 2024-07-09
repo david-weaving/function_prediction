@@ -20,26 +20,39 @@ x_train = np.array([[(1,1),(2,2),(3,3),(4,4),(5,5),(6,6)],
                     [(-3, 5), (-2, 8.5), (-1, 2.3), (0, 1.8), (1, 1), (2, 2.5)],[(5, 7), (6, 9.5), (7, 12), (8, 14.5), (9, 17), (10, 19.5)],[(5, 125), (6, 216), (7, 343), (8, 512), (9, 729), (10, 1000)],
                     [(10, 100), (11, 121), (12, 144), (13, 169), (14, 196), (15, 225)],[(-3, 47), (-2, 30), (-1, 13), (0, 2), (1, 3), (2, 14)],
                     [(-3, 47), (-1.5, 16.75), (0, 2), (1.5, 10.25), (3, 35), (4.5, 76.25)],[(-5, -16), (-2, -7), (0, -1), (3, 8), (6, 17), (8, 23)],
-                    [(1.2, 2.4484), (4.8, 0.1477), (3.3, 0.3885), (7.1, 0.0278), (2.5, 0.6839), (6.4, 0.0541)],[(1.1, 5.5972), (2.3, 11.0365), (3.5, 21.7143), (4.7, 42.9508), (5.9, 84.5274), (7.1, 165.298)]])
-y_train = np.array([["linear"], ["polynomial"], ["exponential"],["exponential"],["polynomial"],["polynomial"],["exponential"],["exponential"],["polynomial"],
-                    ["linear"],["linear"], ["linear"],["exponential"],["polynomial"],["polynomial"],["linear"],["exponential"],["linear"],["polynomial"],
-                    ["exponential"],["exponential"],["polynomial"],["exponential"],["exponential"],["linear"],["polynomial"],["exponential"],["exponential"],
-                    ["exponential"],["linear"],["linear"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["linear"],["exponential"],["exponential"]])
+                    [(1.2, 2.4484), (4.8, 0.1477), (3.3, 0.3885), (7.1, 0.0278), (2.5, 0.6839), (6.4, 0.0541)],[(1.1, 5.5972), (2.3, 11.0365), (3.5, 21.7143), (4.7, 42.9508), (5.9, 84.5274), (7.1, 165.298)],
+                    [(1,1),(2,8),(3,27),(4,64),(5,125),(6,216)],[(7.2, 373.248), (7.5, 421.875), (8.0, 512.0), (8.5, 614.125), (9.0, 729.0), (9.5, 857.375)],
+                    [(0, 0.0), (1, 0.84), (2, 0.91), (3, 0.14), (4, -0.76), (5, -0.99)],[(1.2, 0.93), (2.5, 0.60), (3.7, -0.53), (5.1, -0.93), (6.4, 0.11), (7.6, 0.99)],
+                    [(8, 0.99), (9.3, 0.10), (10.7, -0.98), (12, -0.54), (13.5, 0.39), (15, 0.65)],[(2, 0.91), (3, 0.14), (4, -0.76), (5, -0.99), (6, -0.28), (7, 0.66)],
+                    [(-2, -0.91), (-3, -0.14), (-4, 0.76), (-5, 0.99), (-6, 0.28), (-7, -0.66)],[(-2, 4.09), (-3, 4.84), (-4, 4.37), (-5, 2.82), (-6, 1.14), (-7, 2.47)],
+                    [(1, 4.61), (2, 4.99), (3, 2.91), (4, 0.92), (5, 1.99), (6, 3.92)],[(1, 2.38), (2, 2.97), (3, 1.71), (4, 0.48), (5, 1.54), (6, 2.81)],
+                    [(-9, 0.93), (-8, 1.72), (-7, 3.61), (-6, 4.83), (-5, 4.09), (-4, 2.49)],[(8, 3.06), (9, 3.69), (10, 3.24), (11, 1.59), (12, 0.96), (13, 1.89)],
+                    [(-3, 40), (-1, 7), (0, 2), (2, 1), (3, 4), (5, 82)],[(-3, -38), (-1, -2), (1, 4), (2, 16), (4, 86), (5, 163)],
+                    [(0, 2), (2, 18), (3, 42), (5, 142), (7, 306), (9, 554)],[(1, 4), (3, 18), (5, 54), (7, 122), (9, 228), (11, 378)],
+                    [(1, -2), (2, 5), (3, 32), (4, 109), (5, 278), (6, 575)],[(0, 1), (1, 0), (2, 1), (3, 4), (4, 9), (5, 16)],[(0, 0.0), (1, 1.68), (2, 2.95), (3, 3.61), (4, 3.54), (5, 2.81)],
+                    ])
+y_train = np.array([["polynomial"], ["polynomial"], ["exponential"],["exponential"],["polynomial"],["polynomial"],["exponential"],["exponential"],["polynomial"],
+                    ["polynomial"],["polynomial"], ["polynomial"],["exponential"],["polynomial"],["polynomial"],["polynomial"],["exponential"],["polynomial"],["polynomial"],
+                    ["exponential"],["exponential"],["polynomial"],["exponential"],["exponential"],["polynomial"],["polynomial"],["exponential"],["exponential"],
+                    ["exponential"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["exponential"],["exponential"],
+                    ["polynomial"],["polynomial"],["sine"],["sine"],["sine"],["sine"],["sine"],["sine"],["sine"],["sine"],["sine"],["sine"],["polynomial"],
+                    ["polynomial"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["sine"]])
 
 
 # Encode labels
 label_map = {"linear": 0, "polynomial": 1, "exponential": 2, "sine": 3}
 y_train_encoded = np.array([label_map[label[0]] for label in y_train])
 
+
 # Reshape x_train to fit the model input
 x_train_reshaped = x_train.reshape((len(y_train), 6, 2))
 
 # Split data into training and validation sets
 x_train_split, x_val_split, y_train_split, y_val_split = train_test_split(
-    x_train_reshaped, y_train_encoded, test_size=0.2, random_state=9) # 10 is good
+    x_train_reshaped, y_train_encoded, test_size=0.2, random_state=12) # 10 is good
 
-#print(y_val_split)
-#exit()
+# print(y_val_split)
+# exit()
 # Define and train the model
 model = tf.keras.models.Sequential([
     tf.keras.layers.Dense(64, activation='relu', input_shape=(6, 2)),
