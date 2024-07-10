@@ -3,17 +3,32 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sys import exit
 import func
+from math import sqrt
+from scipy.optimize import curve_fit
 
+x = [10,11,12,13]
+y = [7.90,8.10,8.29,8.48]
 
-x = [1,2,3,4,5,6]
-y= [0.5,1,1.5,2,2.5,3]
+# for A*sqrt(x + C) + D
 
-def fit_linear(x_points, y_points):
-    A = np.vander(x_points, 2) # this creates a matrix of len(x_points) x degree+1. IT CAPTURES EVERY POINT.
-    b = np.array(y_points)
-    coeffs = np.linalg.lstsq(A, b, rcond=None)[0]  # clever way of solving the matrix, not as computationally heavy as inverse solving
-    return coeffs
+# A is pretty accurate, so is C
 
-A,B = fit_linear(x,y)
+def sqrt_func(x,A,C,D):
+   return A*np.sqrt(x + C) + D
 
-print(f"Your Linear Function: {A}x + {B}")
+A = (y[0]*np.sqrt(y[2]*y[2]-y[1]*y[1]))/(np.sqrt(x[0]*(y[2]*y[2]-y[1]*y[1])+y[1]*y[1]*x[2]-x[1]*y[2]*y[2]))
+
+C = (y[1]*y[1]*x[2] - x[1]*y[2]*y[2])/(y[2]*y[2]-y[1]*y[1])
+
+D = y[3]/(A*np.sqrt(x[3]+C))
+
+initial_guess = [A,C,D]
+
+params, _ = curve_fit(sqrt_func, x,y, p0=initial_guess,maxfev=5000)
+
+A,C,D = params
+
+print(f"A = {A}")
+print(f"C = {C}")
+print(f"D = {D}")
+
