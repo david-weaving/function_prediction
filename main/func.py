@@ -47,7 +47,26 @@ def poly_avgerage(x,y,degree):
         b = np.array(y_points)
         coeffs = np.linalg.lstsq(A, b, rcond=None)[0]  # clever way of solving the matrix, not as computationally heavy as inverse solving
         return coeffs
- 
+    
+    def print_poly(coeffs): # used for printing polynomial
+        p = np.size(coeffs) - 1
+        for i in coeffs:
+            if p == np.size(coeffs)-1:
+                print(f"{i}x^{p}", end="")
+            elif i > 0 and p > 0 and p != 1:
+                print(f" + {i}x^{p}", end="")
+            elif i < 0 and p > 0 and p != 1:
+                print(f" - {abs(i)}x^{p}", end="")
+            elif i > 0 and p == 1:
+                print(f" + {i}x", end="")
+            elif i < 0 and p == 1:
+                print(f" - {abs(i)}x", end="")
+            elif i > 0 and p == 0:
+                print(f" + {i}", end="")
+            elif i < 0 and p == 0:
+                print(f" - {abs(i)}", end="")
+            p=p-1
+    
     # for plotting and populating x with more numbers
     x_min = np.min(x)
     x_max = np.max(x)
@@ -63,6 +82,8 @@ def poly_avgerage(x,y,degree):
 
 
     coeffs = fit_polynomial(x, y, degree) # returns coefficients
+    print_poly(coeffs)
+
     y_values = np.polyval(coeffs, x_common)  # fits the points and coefficients to the polynomial
 
     # plotting
@@ -294,7 +315,7 @@ def sine_average(x, y):
 
 def predict_function(x,y): # predicts funtion
         
-    model = tf.keras.models.load_model("function_prediction/models/model_V1.h5")
+    model = tf.keras.models.load_model("models/model_V1.h5")
 
     points = list(zip(x, y))
     print(points)
