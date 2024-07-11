@@ -50,6 +50,7 @@ def poly_avgerage(x,y,degree):
     
     def print_poly(coeffs): # used for printing polynomial
         p = np.size(coeffs) - 1
+        print("Your polynomial function: ", end="")
         for i in coeffs:
             if p == np.size(coeffs)-1:
                 print(f"{i}x^{p}", end="")
@@ -297,6 +298,85 @@ def sine_average(x, y):
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
     plt.title('Sine Fitting')
+    plt.grid(True)
+    plt.xlim(x_plot_min, x_plot_max)
+    plt.ylim(y_plot_min, y_plot_max)
+    plt.plot(x_common, y_values, color='red', label='Average Graph', zorder=1)
+    plt.legend()
+    plt.show()
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(x_common, y_values, color='red', label='Average Graph', zorder=1)
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('Sine Fitting (Full Graph)')
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
+def sqrt_average(x,y):  # most likely not using this, the points are too sensitive
+    
+    # sqrt function
+    def sqrt_func(x, A, C, D):
+        return A * np.sqrt(x + C) + D
+
+    # inital guess for the form y = A*sqrt(x + C) + D
+    def fit_square_root(x,y):
+        A_guess = (y[-1] * np.sqrt(y[-2] * y[-2] - y[-3] * y[-3])) / (np.sqrt(x[-1] * (y[-2] * y[-2] - y[-3] * y[-3]) + y[-3] * y[-3] * x[-2] - x[-3] * y[-2] * y[-2]))
+        C_guess = (y[-3] * y[-3] * x[-2] - x[-3] * y[-2] * y[-2]) / (y[-2] * y[-2] - y[-3] * y[-3])
+        D_guess = y[-1] / (A_guess * np.sqrt(x[-1] + C_guess))
+        initial_guess = [A_guess, C_guess, D_guess]
+
+        # Fit the model to all points
+        params, _ = curve_fit(sqrt_func, x, y, p0=initial_guess, maxfev=50000)
+        return params
+
+    # Extract the optimized parameters
+    A_opt, C_opt, D_opt = fit_square_root(x,y)
+
+    print(f"Square Root Function: {A_opt} * sqrt(x + {C_opt}) + {D_opt}")
+
+    x_min = np.min(x)
+    x_max = np.max(x)
+    y_max = np.max(y)
+    y_min = np.min(y)
+
+    x_common = np.linspace(x_min, x_max, 400)
+
+    # continue the graph
+    x_forward = np.linspace(x_max+0.1, 50, 400)
+    x_backward = np.linspace(C_opt*-1, x_min-0.1, 400) # C_opt * -1 is the end bound (where we dont go below zero in our square root)
+    x_common = np.append(x_common, x_forward)
+    x_common = np.insert(x_common, 0, x_backward)
+
+    y_values = sqrt_func(x_common,A_opt,C_opt,D_opt)
+
+    # Plotting
+    x_margin = (x_max - x_min) * 0.1
+    y_margin = (y_max - y_min) * 0.1
+
+    x_plot_min = x_min - x_margin
+    x_plot_max = x_max + x_margin
+    y_plot_min = y_min - y_margin
+    y_plot_max = y_max + y_margin
+
+
+    plt.figure(figsize=(8, 6))
+    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points', zorder=2)
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('User Points')
+    plt.grid(True)
+    plt.xlim(x_plot_min, x_plot_max)
+    plt.ylim(y_plot_min, y_plot_max)
+    plt.legend()
+    plt.show()
+
+    plt.figure(figsize=(8, 6))
+    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points', zorder=2)
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('Square Root Fitting')
     plt.grid(True)
     plt.xlim(x_plot_min, x_plot_max)
     plt.ylim(y_plot_min, y_plot_max)
