@@ -8,7 +8,7 @@ print(np.size(y_train))
 p=0
 k=0
 j=0
-
+l = 0
 for i in y_train:
     if i == "polynomial":
         p=p+1
@@ -16,12 +16,14 @@ for i in y_train:
         k=k+1
     if i == "sine":
         j=j+1
-print(f'Exponentials: {k}, Poly: {p}, Sine: {j}')
+    if i == "ln":
+        l=l+1
+print(f'Exponentials: {k}, Poly: {p}, Sine: {j}, Natural Log: {l}')
 exit()
 
 
 # Encode labels
-label_map = {"linear": 0, "polynomial": 1, "exponential": 2, "sine": 3}
+label_map = {"ln": 0, "polynomial": 1, "exponential": 2, "sine": 3}
 y_train_encoded = np.array([label_map[label[0]] for label in y_train])
 
 

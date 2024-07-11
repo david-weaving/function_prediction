@@ -393,16 +393,107 @@ def sqrt_average(x,y):  # most likely not using this, the points are too sensiti
     plt.legend()
     plt.show()
 
+def ln_average(x,y):
+    def print_ln():
+        if C < 0 and D < 0:
+            print(f"{A}ln({B}x - {abs(C)}) - {abs(D)}")
+        elif C > 0 and D < 0:
+            print(f"{A}ln({B}x + {C}) - {abs(D)}")
+        elif C < 0 and D > 0:
+            print(f"{A}ln({B}x - {abs(C)}) + {D}")
+        else:
+            print(f"{A}ln({B}x + {C}) + {D}")
+
+    def ln_func(x, A, B, C, D):
+        return A * np.log(B * x + C) + D
+
+    def fit_ln(x,y):
+        # guesses for A,B,C,D given y = Aln(Bx + C) + D
+        A_guess = (np.max(y) - np.min(y)) / np.log(np.max(x) + 1)
+        B_guess = 1 / (np.max(x) - np.min(x))
+        C_guess = abs(np.min(x)) + 1  # Shift to ensure the logarithm argument is positive
+        D_guess = np.mean(y) - A_guess * np.log(B_guess * np.mean(x) + C_guess)
+        initial_guess = [A_guess, B_guess, C_guess, D_guess]
+
+        # fit the curve for ln
+        params, _ = curve_fit(ln_func, x, y, p0=initial_guess, maxfev=10000)
+        
+        return params
+
+
+    A, B, C, D = fit_ln(x,y)
+
+    print_ln()
+
+
+
+    x_min = np.min(x)
+    x_max = np.max(x)
+    y_max = np.max(y)
+    y_min = np.min(y)
+
+    x_common = np.linspace(x_min, x_max, 400)
+
+    # continue the graph
+    x_forward = np.linspace(x_max+0.1, 50, 400)
+    x_backward = np.linspace((0.1-C)/B, x_min-0.1, 400) # C * -1 is the end bound (where we dont go below zero in our square root)
+    x_common = np.append(x_common, x_forward)
+    x_common = np.insert(x_common, 0, x_backward)
+
+    y_values = ln_func(x_common,A,B,C,D)
+
+    # Plotting
+    x_margin = (x_max - x_min) * 0.1
+    y_margin = (y_max - y_min) * 0.1
+
+    x_plot_min = x_min - x_margin
+    x_plot_max = x_max + x_margin
+    y_plot_min = y_min - y_margin
+    y_plot_max = y_max + y_margin
+
+
+    plt.figure(figsize=(8, 6))
+    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points', zorder=2)
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('User Points')
+    plt.grid(True)
+    plt.xlim(x_plot_min, x_plot_max)
+    plt.ylim(y_plot_min, y_plot_max)
+    plt.legend()
+    plt.show()
+
+    plt.figure(figsize=(8, 6))
+    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points', zorder=2)
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('Natural Log Fitting')
+    plt.grid(True)
+    plt.xlim(x_plot_min, x_plot_max)
+    plt.ylim(y_plot_min, y_plot_max)
+    plt.plot(x_common, y_values, color='red', label='Average Graph', zorder=1)
+    plt.legend()
+    plt.show()
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(x_common, y_values, color='red', label='Average Graph', zorder=1)
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('Natural Log Fitting (Full Graph)')
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
 def predict_function(x,y): # predicts funtion
         
-    model = tf.keras.models.load_model("models/model_V1.h5")
+    model = tf.keras.models.load_model("function_prediction/models/model_V1.h5")
 
     points = list(zip(x, y))
     print(points)
 
     predicted_type = predict_function_type(points, model)
     return predicted_type
-    
+
 def predict_function_type(points, model): # returns function type
 
     points_reshaped = np.array([points])  # Reshape to fit model input shape
