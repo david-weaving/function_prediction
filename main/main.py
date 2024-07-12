@@ -7,16 +7,15 @@ import sys
 x = [1,2,3,4,5,6]
 y = [1,4,9,16,25,36]
 
-x = [0.77, 1.06, 1.16, 1.17, 2.25, 5.95]
-y = [2.26, 2.42, 2.46, 2.47, 2.87, 3.63]
-
+x = [-3.0, -1.0, 0.0, 1.0, 2.0, 4.0]
+y = [-0.28, 1.83, 2.0, 1.83, 0.28, -1.58]
+func.sine_average(x,y)
 predicted_function = func.predict_function(x,y)
-func.ln_average(x,y)
 
 
 
 print(f'Your function: {predicted_function}')
-exit()
+
 n = 2 # degree of polynomial
 
 if predicted_function == "polynomial":
@@ -25,5 +24,7 @@ if predicted_function == "sine":
     func.sine_average(x,y)
 if predicted_function == "exponential":
     func.exp_average(x,y)
+if predicted_function == "ln":
+    func.ln_average(x,y)
 
 

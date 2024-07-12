@@ -331,7 +331,7 @@ def sqrt_average(x,y):  # most likely not using this, the points are too sensiti
         params, _ = curve_fit(sqrt_func, x, y, p0=initial_guess, maxfev=50000)
         return params
 
-    # Extract the optimized parameters
+    # return A,C,D
     A_opt, C_opt, D_opt = fit_square_root(x,y)
 
     print(f"Square Root Function: {A_opt} * sqrt(x + {C_opt}) + {D_opt}")
@@ -442,7 +442,7 @@ def ln_average(x,y):
 
     y_values = ln_func(x_common,A,B,C,D)
 
-    # Plotting
+    # plotting
     x_margin = (x_max - x_min) * 0.1
     y_margin = (y_max - y_min) * 0.1
 
@@ -486,7 +486,7 @@ def ln_average(x,y):
 
 def predict_function(x,y): # predicts funtion
         
-    model = tf.keras.models.load_model("models/model_V1.h5")
+    model = tf.keras.models.load_model("C:/Users/Administrator/func pred/function_prediction/models/model_V1_2.h5")
 
     points = list(zip(x, y))
     print(points)
@@ -500,7 +500,7 @@ def predict_function_type(points, model): # returns function type
     prediction = model.predict(points_reshaped)
     predicted_class = np.argmax(prediction)  # Get index of highest probability
     if predicted_class == 0:
-        return "linear"
+        return "ln"
     elif predicted_class == 1:
         return "polynomial"
     elif predicted_class == 2:

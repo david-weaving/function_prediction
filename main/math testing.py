@@ -8,6 +8,8 @@ from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
 
+# make a function to generate points for all functions
+
 
 # Generate 6 random x values in the range [-4, 5)
 x = np.random.uniform(0, 6, 6)
