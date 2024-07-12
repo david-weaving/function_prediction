@@ -411,7 +411,7 @@ def ln_average(x,y):
         # guesses for A,B,C,D given y = Aln(Bx + C) + D
         A_guess = (np.max(y) - np.min(y)) / np.log(np.max(x) + 1)
         B_guess = 1 / (np.max(x) - np.min(x))
-        C_guess = abs(np.min(x)) + 1  # Shift to ensure the logarithm argument is positive
+        C_guess = abs(np.min(x)) + 1  # shift to ensure the logarithm argument is positive
         D_guess = np.mean(y) - A_guess * np.log(B_guess * np.mean(x) + C_guess)
         initial_guess = [A_guess, B_guess, C_guess, D_guess]
 
@@ -486,7 +486,7 @@ def ln_average(x,y):
 
 def predict_function(x,y): # predicts funtion
         
-    model = tf.keras.models.load_model("function_prediction/models/model_V1.h5")
+    model = tf.keras.models.load_model("models/model_V1.h5")
 
     points = list(zip(x, y))
     print(points)
