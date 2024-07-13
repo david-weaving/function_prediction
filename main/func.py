@@ -416,7 +416,7 @@ def ln_average(x,y):
         initial_guess = [A_guess, B_guess, C_guess, D_guess]
 
         # fit the curve for ln
-        params, _ = curve_fit(ln_func, x, y, p0=initial_guess, maxfev=10000)
+        params, _ = curve_fit(ln_func, x, y, p0=initial_guess, maxfev=30000)
         
         return params
 
@@ -486,7 +486,7 @@ def ln_average(x,y):
 
 def predict_function(x,y): # predicts funtion
         
-    model = tf.keras.models.load_model("C:/Users/Administrator/func pred/function_prediction/models/model_V1_3.h5")
+    model = tf.keras.models.load_model("C:/Users/Administrator/func pred/function_prediction/models/model_V1_4.h5")
 
     points = list(zip(x, y))
     print(points)
