@@ -152,9 +152,9 @@ def exp_average(x, y):
 
     def print_exp(params):
         if params[2] > 0 or params[2] == 0:
-            print(f"Exp Function: y = {params[0]} + e^{params[1]}x + {params[2]}")
+            print(f"Exp Function: y = {params[0]}e^{params[1]}x + {params[2]}")
         else:
-            print(f"Exp Function: y = {params[0]} + e^{params[1]}x - {abs(params[2])}")
+            print(f"Exp Function: y = {params[0]}e^{params[1]}x - {abs(params[2])}")
 
     # fit the model to the data
     try:
@@ -486,7 +486,7 @@ def ln_average(x,y):
 
 def predict_function(x,y): # predicts funtion
         
-    model = tf.keras.models.load_model("C:/Users/Administrator/func pred/function_prediction/models/model_V1_2.h5")
+    model = tf.keras.models.load_model("C:/Users/Administrator/func pred/function_prediction/models/model_V1_3.h5")
 
     points = list(zip(x, y))
     print(points)
