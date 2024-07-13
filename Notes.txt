@@ -107,3 +107,7 @@ Most square root points appear very close to linear unless defined closely aroun
 
 For now, I will not be using the square model in either training or testing, however, the function exists and works.
 The reason for this is that the points seem to very sensative, we will see about adding it in the future.
+
+7/13/24
+
+Model V1_4 is the newest and it's pretty decent. Keep testing data and update as needed, keep in mind that the shape is what matters most.
