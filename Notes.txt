@@ -111,3 +111,7 @@ The reason for this is that the points seem to very sensative, we will see about
 7/13/24
 
 Model V1_4 is the newest and it's pretty decent. Keep testing data and update as needed, keep in mind that the shape is what matters most.
+Needs work on higher degree polynomials.
+
+Testing with roughness added is interesting, the model either predicts right or the points are so out of shape it doesn't even appear to be its function anymore.
+Would it even be fair

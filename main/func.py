@@ -145,6 +145,7 @@ def exp_average(x, y):
                 b_guess = 0.1  # if a negative falls into the log we default guess
         except (ValueError, IndexError):
             b_guess = 0.1  # if there is some value error in the log we default guess
+            
         
         C_guess = np.min(y_points)  # C is guessed based on the smallest y value
         
