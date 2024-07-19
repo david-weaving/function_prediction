@@ -7,8 +7,9 @@ import sys
 x = [1,2,3,4,5,6]
 y = [1,4,9,16,25,36]
 
-x = [-0.09, -0.09, 2.41, 3.0, 3.09, 3.87]
-y = [9.57, 9.57, 15.47, 16.22, 16.33, 17.16]
+# NEED TO RETRAIN MODELLLLL
+
+
 
 predicted_function = func.predict_function(x,y)
 

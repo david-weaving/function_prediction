@@ -102,7 +102,7 @@ coeffs = np.round(random_coeffs, 0)
 
 y=[]
 # Calculate y values
-y = [coeffs[0]*np.exp(coeffs[1]*x_adj + coeffs[2]) + coeffs[3] for x_adj in x]
+y = [coeffs[0]*np.exp(-coeffs[1]*x_adj + coeffs[2]) + coeffs[3] for x_adj in x]
 
 
 

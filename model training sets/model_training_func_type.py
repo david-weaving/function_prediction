@@ -32,7 +32,7 @@ x_train_reshaped = x_train.reshape((len(y_train), 6, 2))
 
 # Split data into training and validation sets
 x_train_split, x_val_split, y_train_split, y_val_split = train_test_split(
-    x_train_reshaped, y_train_encoded, test_size=0.2, random_state=9) # 10 is good
+    x_train_reshaped, y_train_encoded, test_size=0.2, random_state=11) # 10 is good
 
 # l=0
 # p=0
@@ -73,7 +73,7 @@ steps_per_epoch = len(x_train_reshaped) // batch_size  # Batch size is 1, so we 
 # Train the model with validation data
 history = model.fit(x_train_reshaped, y_train_encoded, 
                     validation_data=(x_val_split, y_val_split),
-                    epochs=1550, batch_size=batch_size, steps_per_epoch=steps_per_epoch)
+                    epochs=1500, batch_size=batch_size, steps_per_epoch=steps_per_epoch)
 
 # Evaluate model performance on validation data
 val_loss, val_acc = model.evaluate(x_val_split, y_val_split)
