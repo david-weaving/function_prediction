@@ -115,3 +115,8 @@ Needs work on higher degree polynomials.
 
 Testing with roughness added is interesting, the model either predicts right or the points are so out of shape it doesn't even appear to be its function anymore.
 Would it even be fair
+
+7/18/24
+
+the model is better, not perfect (it probably wont be ever be "perfect" but starting to reach a good level)
+Model V6 is pretty good. We can start moving on to the second model; predicting the degree of polynomial
