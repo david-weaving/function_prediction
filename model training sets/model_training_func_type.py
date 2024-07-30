@@ -3,23 +3,23 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from data import x_train, y_train
 
-# print(np.size(x_train,0))
-# print(np.size(y_train))
-# p=0
-# k=0
-# j=0
-# l = 0
-# for i in y_train:
-#     if i == "polynomial":
-#         p=p+1
-#     if i == "exponential":
-#         k=k+1
-#     if i == "sine":
-#         j=j+1
-#     if i == "ln":
-#         l=l+1
-# print(f'Exponentials: {k}, Poly: {p}, Sine: {j}, Natural Log: {l}')
-# exit()
+print(np.size(x_train,0))
+print(np.size(y_train))
+p=0
+k=0
+j=0
+l = 0
+for i in y_train:
+    if i == "polynomial":
+        p=p+1
+    if i == "exponential":
+        k=k+1
+    if i == "sine":
+        j=j+1
+    if i == "ln":
+        l=l+1
+print(f'Exponentials: {k}, Poly: {p}, Sine: {j}, Natural Log: {l}')
+exit()
 
 
 # Encode labels
@@ -73,11 +73,11 @@ steps_per_epoch = len(x_train_reshaped) // batch_size  # Batch size is 1, so we 
 # Train the model with validation data
 history = model.fit(x_train_reshaped, y_train_encoded, 
                     validation_data=(x_val_split, y_val_split),
-                    epochs=2500, batch_size=batch_size, steps_per_epoch=steps_per_epoch)
+                    epochs=2600, batch_size=batch_size, steps_per_epoch=steps_per_epoch)
 
 # Evaluate model performance on validation data
 val_loss, val_acc = model.evaluate(x_val_split, y_val_split)
 print(f"Validation accuracy: {val_acc}")
 
 # Save the model
-model.save("C:/Users/Administrator/func pred/function_prediction/models/model_V1_6.h5")
+model.save("C:/Users/Administrator/func pred/function_prediction/models/model_V1_7.h5")

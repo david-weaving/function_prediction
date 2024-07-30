@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 x = [-2,-1,0,1,2,3]
 
-x = np.random.uniform(-1,5, 6)
+x = np.random.uniform(-2,7, 6)
 x = np.sort(x)  # Sort x values
 x = np.round(x, 2)
 x = x.tolist()
@@ -73,12 +73,12 @@ print(f"y = {y.tolist()}")
 
 
 # Generate random coefficients
-random_coeffs = np.random.uniform(-2, 4, 4)
+random_coeffs = np.random.uniform(-2, 4, 6)
 coeffs = np.round(random_coeffs, 0)
 
 y=[]
 # Calculate y values
-y = [coeffs[0]*x_adj*x_adj + coeffs[1]*x_adj - coeffs[2] for x_adj in x]
+y = [coeffs[0]*x_adj*x_adj*x_adj + coeffs[1]*x_adj*x_adj + coeffs[2]*x_adj + coeffs[3] for x_adj in x]
 roughness = []
 
 
