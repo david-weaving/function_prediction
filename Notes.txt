@@ -122,3 +122,7 @@ the model is better, not perfect (it probably wont be ever be "perfect" but star
 Model V6 is pretty good. We can start moving on to the second model; predicting the degree of polynomial
 
 New idea: instead of drying to hammer home the idea of a linear function, whenever the model fails to fit a function, we can default it to a polynomial
+
+7/30/24
+
+FOR THE WEBSITE: USE THE EXP FUNCTION AS A REFERENCE TO MODEL THE REST.
