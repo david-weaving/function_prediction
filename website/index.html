@@ -7,13 +7,30 @@
 </head>
 <body>
     <h1>Function Prediction</h1>
+
+    <label for="x_input">X values (comma separated):</label>
+    <input type="text" id="x_input" placeholder="e.g. 0.5, 1.0, 1.5">
+
+    <label for="y_input">Y values (comma separated):</label>
+    <input type="text" id="y_input" placeholder="e.g. 0.19, 0.98, 1.52">
+
     <button onclick="processData()">Get Prediction</button>
     <div id="results"></div>
 
     <script>
         async function processData() {
             try {
-                const response = await fetch('/process');
+                const x_input = document.getElementById('x_input').value.split(',').map(Number);
+                const y_input = document.getElementById('y_input').value.split(',').map(Number);
+
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ x: x_input, y: y_input })
+                });
+
                 const data = await response.json();
 
                 if (data.error) {
