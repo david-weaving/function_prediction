@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Function Prediction</title>
+</head>
+<body>
+    <h1>Function Prediction</h1>
+    <button onclick="processData()">Get Prediction</button>
+    <div id="results"></div>
+
+    <script>
+        async function processData() {
+            try {
+                const response = await fetch('/process');
+                const data = await response.json();
+
+                if (data.error) {
+                    document.getElementById('results').innerText = `Error: ${data.error}`;
+                    return;
+                }
+
+                const { x_common, y_fit, predicted_function, function: e_function } = data.result;
+                const resultsDiv = document.getElementById('results');
+
+                resultsDiv.innerHTML = `<h2>Predicted Function: ${predicted_function}</h2>`;
+                resultsDiv.innerHTML += `<h2>Function: ${e_function}</h2>`;
+                resultsDiv.innerHTML += '<h3>Points:</h3>';
+                resultsDiv.innerHTML += '<ul>';
+                for (let i = 0; i < x_common.length; i++) {
+                    resultsDiv.innerHTML += `<li>(x: ${x_common[i]}, y: ${y_fit[i]})</li>`;
+                }
+                resultsDiv.innerHTML += '</ul>';
+            } catch (error) {
+                document.getElementById('results').innerText = `Error: ${error}`;
+            }
+        }
+    </script>
+</body>
+</html>
