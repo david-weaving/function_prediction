@@ -48,25 +48,27 @@ def poly_average(x,y,degree):
         coeffs = np.linalg.lstsq(A, b, rcond=None)[0]  # clever way of solving the matrix, not as computationally heavy as inverse solving
         return coeffs
     
-    def print_poly(coeffs): # used for printing polynomial
+    def print_poly(coeffs):
         p = np.size(coeffs) - 1
-        print("Your polynomial function: ", end="")
+        e_func = ""
         for i in coeffs:
-            if p == np.size(coeffs)-1:
-                print(f"{i}x^{p}", end="")
+            if p == np.size(coeffs) - 1:
+                e_func += f"{i}x^{p}"
             elif i > 0 and p > 0 and p != 1:
-                print(f" + {i}x^{p}", end="")
+                e_func += f" + {i}x^{p}"
             elif i < 0 and p > 0 and p != 1:
-                print(f" - {abs(i)}x^{p}", end="")
+                e_func += f" - {abs(i)}x^{p}"
             elif i > 0 and p == 1:
-                print(f" + {i}x", end="")
+                e_func += f" + {i}x"
             elif i < 0 and p == 1:
-                print(f" - {abs(i)}x", end="")
+                e_func += f" - {abs(i)}x"
             elif i > 0 and p == 0:
-                print(f" + {i}", end="")
+                e_func += f" + {i}"
             elif i < 0 and p == 0:
-                print(f" - {abs(i)}", end="")
-            p=p-1
+                e_func += f" - {abs(i)}"
+            p = p - 1
+        return e_func
+
     
     # for plotting and populating x with more numbers
     x_min = np.min(x)
@@ -87,48 +89,8 @@ def poly_average(x,y,degree):
 
     y_values = np.polyval(coeffs, x_common)  # fits the points and coefficients to the polynomial
 
-    # plotting
-
-    x_margin = (x_max - x_min) * 0.1
-    y_margin = (y_max - y_min) * 0.1
-
-    x_plot_min = x_min - x_margin
-    x_plot_max = x_max + x_margin
-    y_plot_min = y_min - y_margin
-    y_plot_max = y_max + y_margin
-
-    plt.figure(figsize=(8, 6))
-    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points',zorder=2)
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.title('User Points')
-    plt.grid(True)
-    plt.xlim(x_plot_min, x_plot_max) # for limits on the plots
-    plt.ylim(y_plot_min, y_plot_max)
-    plt.legend()
-    plt.show()
-
-    # Plotting
-    plt.figure(figsize=(8, 6))
-    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points', zorder=2)
-    plt.plot(x_common,   y_values, color='red', label='Average Graph', zorder=1)
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.title('Polynomial Fitting')
-    plt.grid(True)
-    plt.xlim(x_plot_min, x_plot_max)
-    plt.ylim(y_plot_min, y_plot_max)
-    plt.legend()
-    plt.show()
-
-    plt.figure(figsize=(8, 6))
-    plt.plot(x_common,  y_values, color='red', label='Average Graph', zorder=1)
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.title('Polynomial Fitting (Full Graph)')
-    plt.grid(True)
-    plt.legend()
-    plt.show()
+    
+    return x_common.tolist(), y_values.tolist(), print_poly(coeffs)
 
 def exp_average(x, y):
     # define the exp model fitting function
@@ -153,10 +115,10 @@ def exp_average(x, y):
 
     def print_exp(params):
         if params[2] > 0 or params[2] == 0:
-            e_func = f"y = {params[0]}e^{params[1]}x + {params[2]}"
+            e_func = f"{params[0]}e^{params[1]}x + {params[2]}"
             return e_func
         else:
-            e_func = f"y = {params[0]}e^{params[1]}x - {abs(params[2])}"
+            e_func = f"{params[0]}e^{params[1]}x - {abs(params[2])}"
             return e_func
 
     # fit the model to the data
@@ -166,7 +128,6 @@ def exp_average(x, y):
         print(f"Error fitting data: {e}")
         return
 
-    e_func = print_exp(params)
 
     A_fit, b_fit, C_fit = params
     
@@ -174,7 +135,7 @@ def exp_average(x, y):
     x_common = np.linspace(np.min(x), np.max(x), 400)
     y_fit = exp_model(x_common, A_fit, b_fit, C_fit) 
 
-    return x_common.tolist(), y_fit.tolist(), e_func
+    return x_common.tolist(), y_fit.tolist(), print_exp(params)
 
 def sine_average(x, y):
 
@@ -200,13 +161,15 @@ def sine_average(x, y):
     # for printing the function
     def print_sine(A,B,C,D):
         if D > 0 and C > 0:
-            print(f"Your SINE function: {A}sin({B}x + {D}) + {C}")
+            e_func = f"{A}sin({B}x + {D}) + {C}"
         elif D < 0 and C > 0:
-            print(f"Your SINE function: {A}sin({B}x - {abs(D)}) + {C}")
+            e_func = f"{A}sin({B}x - {abs(D)}) + {C}"
         elif D > 0 and C < 0:
-            print(f"Your SINE function: {A}sin({B}x + {D}) - {abs(C)}")
+            e_func = f"{A}sin({B}x + {D}) - {abs(C)}"
         else:
-            print(f"Your SINE function: {A}sin({B}x - {abs(D)}) - {abs(C)}")
+            e_func = f"{A}sin({B}x - {abs(D)}) - {abs(C)}"
+        
+        return e_func
 
     x_min = np.min(x)
     x_max = np.max(x)
@@ -229,49 +192,8 @@ def sine_average(x, y):
         print(f"Error fitting data: {e}")
         exit()
 
-    print_sine(A,B,C,D)
-
-    # Plotting
-    x_margin = (x_max - x_min) * 0.1
-    y_margin = (y_max - y_min) * 0.1
-
-    x_plot_min = x_min - x_margin
-    x_plot_max = x_max + x_margin
-    y_plot_min = y_min - y_margin
-    y_plot_max = y_max + y_margin
-
-
-    plt.figure(figsize=(8, 6))
-    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points', zorder=2)
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.title('User Points')
-    plt.grid(True)
-    plt.xlim(x_plot_min, x_plot_max)
-    plt.ylim(y_plot_min, y_plot_max)
-    plt.legend()
-    plt.show()
-
-    plt.figure(figsize=(8, 6))
-    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points', zorder=2)
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.title('Sine Fitting')
-    plt.grid(True)
-    plt.xlim(x_plot_min, x_plot_max)
-    plt.ylim(y_plot_min, y_plot_max)
-    plt.plot(x_common, y_values, color='red', label='Average Graph', zorder=1)
-    plt.legend()
-    plt.show()
-
-    plt.figure(figsize=(8, 6))
-    plt.plot(x_common, y_values, color='red', label='Average Graph', zorder=1)
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.title('Sine Fitting (Full Graph)')
-    plt.grid(True)
-    plt.legend()
-    plt.show()
+    
+    return x_common.tolist(), y_values.tolist(), print_sine(A,B,C,D)
 
 def sqrt_average(x,y):  # most likely not using this, the points are too sensitive
     
@@ -353,15 +275,16 @@ def sqrt_average(x,y):  # most likely not using this, the points are too sensiti
     plt.show()
 
 def ln_average(x,y):
-    def print_ln():
+    def print_ln(A,B,C,D):
         if C < 0 and D < 0:
-            print(f"{A}ln({B}x - {abs(C)}) - {abs(D)}")
+            e_func = f"{A}ln({B}x - {abs(C)}) - {abs(D)}"
         elif C > 0 and D < 0:
-            print(f"{A}ln({B}x + {C}) - {abs(D)}")
+            e_func = f"{A}ln({B}x + {C}) - {abs(D)}"
         elif C < 0 and D > 0:
-            print(f"{A}ln({B}x - {abs(C)}) + {D}")
+            e_func = f"{A}ln({B}x - {abs(C)}) + {D}"
         else:
-            print(f"{A}ln({B}x + {C}) + {D}")
+            e_func = f"{A}ln({B}x + {C}) + {D}"
+        return e_func
 
     def ln_func(x, A, B, C, D):
         return A * np.log(B * x + C) + D
@@ -382,7 +305,7 @@ def ln_average(x,y):
 
     A, B, C, D = fit_ln(x,y)
 
-    print_ln()
+    print_ln(A,B,C,D)
 
 
 
@@ -401,7 +324,7 @@ def ln_average(x,y):
 
     y_values = ln_func(x_common,A,B,C,D)
 
-    return x_common, y_values
+    return x_common.tolist(), y_values.tolist(), print_ln(A,B,C,D)
 
 def predict_function(x,y): # predicts funtion
         
