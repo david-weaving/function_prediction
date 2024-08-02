@@ -16,7 +16,6 @@ def process():
         y = data['y']
 
         predicted_function = func_web.predict_function(x, y)
-        print(f'Your function: {predicted_function}')
 
         x_common, y_fit, e_function = [], [], ""
 
