@@ -16,60 +16,115 @@
     <input type="text" id="y_input" placeholder="e.g. 0.19, 0.98, 1.52">
 
     <button onclick="processData()">Get Prediction</button>
+    <button onclick="clearInputs()">Clear Inputs</button>
     <div id="results"></div>
     <canvas id="myChart" width="400" height="200"></canvas>
 
     <script>
+        let chart;  // Declare chart variable in the global scope
+
+        function clearInputs() {
+            document.getElementById('x_input').value = '';
+            document.getElementById('y_input').value = '';
+            document.getElementById('results').innerHTML = '';
+            if (chart) {
+                chart.destroy();  // Destroy the existing chart
+            }
+        }
+
         async function processData() {
             try {
                 const x_input = document.getElementById('x_input').value.split(',').map(Number);
                 const y_input = document.getElementById('y_input').value.split(',').map(Number);
 
-                const response = await fetch('/process', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ x: x_input, y: y_input })
-                });
+                // Input validation
+                if (!x_input.length || !y_input.length) {
+                    document.getElementById('results').innerText = 'Error: Please input both X and Y values.';
+                } else if (x_input.length !== y_input.length) {
+                    document.getElementById('results').innerText = 'Error: X and Y values must have the same length.';
+                } else if (x_input.some(isNaN) || y_input.some(isNaN)) {
+                    document.getElementById('results').innerText = 'Error: X and Y values must be numbers separated by commas.';
+                } else {
+                    const response = await fetch('/process', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ x: x_input, y: y_input })
+                    });
 
-                const data = await response.json();
+                    const data = await response.json();
 
-                if (data.error) {
-                    document.getElementById('results').innerText = `Error: ${data.error}`;
-                    return;
-                }
+                    if (data.error) {
+                        document.getElementById('results').innerText = `Error: ${data.error}`;
+                        return;
+                    }
 
-                const { x_common, y_fit, predicted_function, function: e_function } = data.result;
-                const resultsDiv = document.getElementById('results');
+                    const { x_common, y_fit, predicted_function, function: e_function } = data.result;
+                    const resultsDiv = document.getElementById('results');
 
-                resultsDiv.innerHTML = `<h2>Predicted Function: ${predicted_function}</h2>`;
-                resultsDiv.innerHTML += `<h2>Function: ${e_function}</h2>`;
-                resultsDiv.innerHTML += '<ul>';
+                    resultsDiv.innerHTML = `<h2>Predicted Function: ${predicted_function}</h2>`;
+                    resultsDiv.innerHTML += `<h2>Function: ${e_function}</h2>`;
 
-                // Plot the data using Chart.js
-                const ctx = document.getElementById('myChart').getContext('2d');
-                const myChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: x_common,
-                        datasets: [{
-                            label: 'Fitted Points',
-                            data: y_fit,
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 2,
-                            fill: false
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            x: {
-                                type: 'linear',
-                                position: 'bottom'
+                    // Get the bounds for the user input points
+                    const xMin = Math.min(...x_input, ...x_common) - 1;
+                    const xMax = Math.max(...x_input, ...x_common) + 1;
+                    const yMin = Math.min(...y_input, ...y_fit) - 1;
+                    const yMax = Math.max(...y_input, ...y_fit) + 1;
+
+                    // Update the chart or create a new one
+                    const ctx = document.getElementById('myChart').getContext('2d');
+                    if (chart) {
+                        chart.destroy();  // Destroy the existing chart before creating a new one
+                    }
+                    chart = new Chart(ctx, {
+                        type: 'scatter',
+                        data: {
+                            datasets: [
+                                {
+                                    label: 'Fitted Curve',
+                                    data: x_common.map((x, i) => ({ x, y: y_fit[i] })),
+                                    borderColor: 'blue',
+                                    fill: false,
+                                    showLine: true,
+                                    pointRadius: 0,
+                                    order: 2,
+                                },
+                                {
+                                    label: 'User Points',
+                                    data: x_input.map((x, i) => ({ x, y: y_input[i] })),
+                                    backgroundColor: 'red',
+                                    borderColor: 'red',
+                                    pointRadius: 5,  // Reduce point size
+                                    order: 1,  // Ensure user points are drawn above the fitted curve
+                                }
+                            ]
+                        },
+                        options: {
+                            scales: {
+                                x: {
+                                    type: 'linear',
+                                    position: 'bottom',
+                                    min: xMin,
+                                    max: xMax
+                                },
+                                y: {
+                                    min: yMin,
+                                    max: yMax
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `(${context.raw.x}, ${context.raw.y})`;
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }
             } catch (error) {
                 document.getElementById('results').innerText = `Error: ${error}`;
             }
