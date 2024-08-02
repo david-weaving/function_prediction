@@ -205,7 +205,8 @@ x_train = np.array([[(1,1),(2,2),(3,3),(4,4),(5,5),(6,6)],
                     [(-0.4, 3.0), (2.73, -1.0), (5.05, 2.39), (5.56, 2.91), (5.73, 2.98), (5.75, 2.99)],[(-0.65, 3.95), (-0.05, 3.86), (1.88, 0.65), (4.19, 1.81), (4.41, 2.25), (6.49, 3.61)],
                     [(1.21, 0.04), (2.94, 2.0), (4.34, 0.05), (4.66, 0.05), (5.03, 0.51), (6.78, 1.15)],[(-1.7, 2.59), (-0.89, 3.79), (2.21, 0.25), (5.62, 3.95), (6.46, 3.64), (6.48, 3.62)],
                     [(-4.98, 1864.69), (-4.32, 1195.32), (-2.91, 174.91), (0.77, 3.27), (1.73, 9.77), (3.98, 426.45)],[(-4.58, 1127.68), (-2.33, 79.37), (-0.89, 0.97), (1.45, 5.08), (3.02, 151.92), (4.78, 1061.36)],
-                    [(0, -2.0), (1, -0.66), (2, 1.84), (3, 0.92), (4, -2.54), (5, -0.72)],[(0.31, 3.48), (2.73, 0.0), (3.97, 1.38), (5.01, 3.33), (5.03, 3.36), (5.82, 4.0)]])
+                    [(0, -2.0), (1, -0.66), (2, 1.84), (3, 0.92), (4, -2.54), (5, -0.72)],[(0.31, 3.48), (2.73, 0.0), (3.97, 1.38), (5.01, 3.33), (5.03, 3.36), (5.82, 4.0)],[(1, 11), (2, 12), (3, 13), (4, 12), (5, 11), (6, 10)],
+                    [(1, 7), (4, 9), (6, 13), (8, 14), (9, 9), (10, 7)],[(-2.0, 3.0), (-1.0, -6.0), (0.0, -5.0), (1.0, 0.0), (2.0, 9.0), (3.0, 22.0)]])
 
 
 y_train = np.array([["polynomial"], ["polynomial"], ["exponential"],["exponential"],["polynomial"],["polynomial"],["exponential"],["exponential"],["polynomial"],
@@ -236,6 +237,6 @@ y_train = np.array([["polynomial"], ["polynomial"], ["exponential"],["exponentia
                     ["polynomial"],["ln"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["sine"],["sine"],["sine"],["sine"],["ln"],["ln"],["ln"],["ln"],["ln"],["ln"],["ln"],["ln"],["ln"],
                     ["ln"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],
                     ["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["sine"],["sine"],["sine"],["exponential"],["polynomial"],["sine"],["exponential"],
-                    ["polynomial"],["exponential"],["sine"],["sine"],["sine"],["sine"],["sine"],["polynomial"],["polynomial"],["sine"],["sine"]])
+                    ["polynomial"],["exponential"],["sine"],["sine"],["sine"],["sine"],["sine"],["polynomial"],["polynomial"],["sine"],["sine"],["sine"],["sine"],["polynomial"]])
 
 
