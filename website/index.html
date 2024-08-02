@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Function Prediction</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <h1>Function Prediction</h1>
@@ -16,6 +17,7 @@
 
     <button onclick="processData()">Get Prediction</button>
     <div id="results"></div>
+    <canvas id="myChart" width="400" height="200"></canvas>
 
     <script>
         async function processData() {
@@ -43,12 +45,31 @@
 
                 resultsDiv.innerHTML = `<h2>Predicted Function: ${predicted_function}</h2>`;
                 resultsDiv.innerHTML += `<h2>Function: ${e_function}</h2>`;
-                resultsDiv.innerHTML += '<h3>Points:</h3>';
                 resultsDiv.innerHTML += '<ul>';
-                for (let i = 0; i < x_common.length; i++) {
-                    resultsDiv.innerHTML += `<li>(x: ${x_common[i]}, y: ${y_fit[i]})</li>`;
-                }
-                resultsDiv.innerHTML += '</ul>';
+
+                // Plot the data using Chart.js
+                const ctx = document.getElementById('myChart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: x_common,
+                        datasets: [{
+                            label: 'Fitted Points',
+                            data: y_fit,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 2,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
             } catch (error) {
                 document.getElementById('results').innerText = `Error: ${error}`;
             }
