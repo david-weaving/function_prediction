@@ -328,7 +328,7 @@ def ln_average(x,y):
 
 def predict_function(x,y): # predicts funtion
         
-    model = tf.keras.models.load_model("C:/Users/david/OneDrive/Desktop/function_prediction/models/model_V1_7.h5")
+    model = tf.keras.models.load_model("models/model_V1_7.h5")
 
     points = list(zip(x, y))
     print(points)
