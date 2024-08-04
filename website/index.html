@@ -51,7 +51,7 @@
         #results {
             margin-top: 20px;
         }
-        #myChart {
+        #myChart, #fittedChart {
             max-width: 100%;
             height: 400px;
         }
@@ -61,10 +61,10 @@
     <h1>Function Prediction</h1>
 
     <label for="x_input">X values (comma separated):</label>
-    <input type="text" id="x_input" placeholder="e.g. x1, x2, x3, x4, x5, x6">
+    <input type="text" id="x_input" placeholder="e.g. 1, 5, 10, 15, 20, 25">
 
     <label for="y_input">Y values (comma separated):</label>
-    <input type="text" id="y_input" placeholder="e.g. y1, y2, y3, y4, y5, y6">
+    <input type="text" id="y_input" placeholder="e.g. 2, 4, 8, 16, 32, 64">
 
     <button onclick="processData()">Get Prediction</button>
     <button onclick="clearInputs()">Clear Inputs</button>
@@ -72,17 +72,22 @@
     <a href="/info" target="_blank">How It Works</a>
     
     <div id="results"></div>
-    <canvas id="myChart"></canvas>
+    <div id="chartsContainer"></div>
 
     <script>
         let chart;  // Declare chart variable in the global scope
+        let fittedChart; // Declare the second chart variable in the global scope
 
         function clearInputs() {
             document.getElementById('x_input').value = '';
             document.getElementById('y_input').value = '';
             document.getElementById('results').innerHTML = '';
+            document.getElementById('chartsContainer').innerHTML = '';
             if (chart) {
                 chart.destroy();  // Destroy the existing chart
+            }
+            if (fittedChart) {
+                fittedChart.destroy();  // Destroy the second chart if it exists
             }
         }
 
@@ -118,11 +123,20 @@
                 resultsDiv.innerHTML = `<h2>Predicted Function: ${predicted_function}</h2>`;
                 resultsDiv.innerHTML += `<h2>Function: ${e_function}</h2>`;
 
+                // Add chart containers
+                const chartsContainer = document.getElementById('chartsContainer');
+                chartsContainer.innerHTML = `
+                    <h2>Predicted Graph with Fitted Points</h2>
+                    <canvas id="myChart"></canvas>
+                    <h2>Full Predicted Graph</h2>
+                    <canvas id="fittedChart"></canvas>
+                `;
+
                 // Get the bounds for the user input points
-                const xMin = Math.min(...x_input, ...x_common) - 1;
-                const xMax = Math.max(...x_input, ...x_common) + 1;
-                const yMin = Math.min(...y_input, ...y_fit) - 1;
-                const yMax = Math.max(...y_input, ...y_fit) + 1;
+                const xMin = Math.min(...x_input) - 1;
+                const xMax = Math.max(...x_input) + 1;
+                const yMin = Math.min(...y_input) - 1;
+                const yMax = Math.max(...y_input) + 1;
 
                 // Update the chart or create a new one
                 const ctx = document.getElementById('myChart').getContext('2d');
@@ -137,9 +151,11 @@
                                 label: 'Fitted Curve',
                                 data: x_common.map((x, i) => ({ x, y: y_fit[i] })),
                                 borderColor: 'blue',
+                                backgroundColor: 'transparent',
                                 fill: false,
                                 showLine: true,
                                 pointRadius: 0,
+                                borderWidth: 2, // Thicker line for the fitted curve
                                 order: 2,
                             },
                             {
@@ -147,8 +163,8 @@
                                 data: x_input.map((x, i) => ({ x, y: y_input[i] })),
                                 backgroundColor: 'red',
                                 borderColor: 'red',
-                                pointRadius: 5,  // Reduce point size
-                                order: 1,  // Ensure user points are drawn above the fitted curve
+                                pointRadius: 5, // Reduce point size
+                                order: 1, // Ensure user points are drawn above the fitted curve
                             }
                         ]
                     },
@@ -158,11 +174,47 @@
                                 type: 'linear',
                                 position: 'bottom',
                                 min: xMin,
-                                max: xMax
+                                max: xMax,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)',
+                                    borderColor: 'black',
+                                    borderWidth: 2,
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'X Axis',
+                                    font: {
+                                        size: 16
+                                    }
+                                },
+                                ticks: {
+                                    color: '#000', // Black color for x-axis labels
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                }
                             },
                             y: {
                                 min: yMin,
-                                max: yMax
+                                max: yMax,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)',
+                                    borderColor: 'black',
+                                    borderWidth: 2,
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Y Axis',
+                                    font: {
+                                        size: 16
+                                    }
+                                },
+                                ticks: {
+                                    color: '#000', // Black color for y-axis labels
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                }
                             }
                         },
                         plugins: {
@@ -172,10 +224,115 @@
                                         return `(${context.raw.x}, ${context.raw.y})`;
                                     }
                                 }
+                            },
+                            legend: {
+                                labels: {
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            }
+                        },
+                        elements: {
+                            point: {
+                                pointStyle: 'circle'
                             }
                         }
                     }
                 });
+
+                // Create the second chart for the full predicted function
+                const fittedCtx = document.getElementById('fittedChart').getContext('2d');
+                fittedChart = new Chart(fittedCtx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Fitted Curve',
+                                data: x_common.map((x, i) => ({ x, y: y_fit[i] })),
+                                borderColor: 'blue',
+                                backgroundColor: 'transparent',
+                                fill: false,
+                                showLine: true,
+                                pointRadius: 0,
+                                borderWidth: 2, // Thicker line for the fitted curve
+                                order: 2,
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                min: Math.min(...x_common) - 1,
+                                max: Math.max(...x_common) + 1,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)',
+                                    borderColor: 'black',
+                                    borderWidth: 2,
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'X Axis',
+                                    font: {
+                                        size: 16
+                                    }
+                                },
+                                ticks: {
+                                    color: '#000', // Black color for x-axis labels
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            y: {
+                                min: Math.min(...y_fit) - 1,
+                                max: Math.max(...y_fit) + 1,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)',
+                                    borderColor: 'black',
+                                    borderWidth: 2,
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Y Axis',
+                                    font: {
+                                        size: 16
+                                    }
+                                },
+                                ticks: {
+                                    color: '#000', // Black color for y-axis labels
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return `(${context.raw.x}, ${context.raw.y})`;
+                                    }
+                                }
+                            },
+                            legend: {
+                                labels: {
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            }
+                        },
+                        elements: {
+                            point: {
+                                pointStyle: 'circle'
+                            }
+                        }
+                    }
+                });
+
             } catch (error) {
                 document.getElementById('results').innerText = `Error: ${error}`;
             }
