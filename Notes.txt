@@ -126,3 +126,19 @@ New idea: instead of drying to hammer home the idea of a linear function, whenev
 7/30/24
 
 FOR THE WEBSITE: USE THE EXP FUNCTION AS A REFERENCE TO MODEL THE REST.
+
+08/03/24
+
+VERY IMPORTANT! HOW TO USE PYTHONANYWHERE:
+
+Activate Virtual Learning Environment:
+python3.10 -m venv venv
+source venv/bin/activate
+
+python run.py  (runs the main)
+
+08/04/24
+
+Using pythonanwhere to host the website ($6 a month), then bought a domain on square space ($20 yearly) name for the website:  https://www.functionprediction.com/
+
+
