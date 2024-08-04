@@ -1,5 +1,5 @@
+import os
 from flask import Flask, request, jsonify, send_from_directory
-import numpy as np
 import func_web
 
 app = Flask(__name__)
@@ -8,15 +8,17 @@ app = Flask(__name__)
 def serve_html():
     return send_from_directory('.', 'index.html')
 
+@app.route('/info')
+def serve_info():
+    return send_from_directory('.', 'info.html')
+
 @app.route('/process', methods=['POST'])
 def process():
     try:
         data = request.json
         x = data['x']
         y = data['y']
-
         predicted_function = func_web.predict_function(x, y)
-
         x_common, y_fit, e_function = [], [], ""
 
         if predicted_function == "polynomial":
@@ -43,5 +45,4 @@ def process():
         return jsonify({"error": str(e)})
 
 if __name__ == '__main__':
-    app.run(debug=True)
-
+    app.run()
