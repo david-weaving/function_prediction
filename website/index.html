@@ -5,6 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Function Prediction</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        a {
+            display: block;
+            margin: 20px 0;
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        #myChart {
+            max-width: 100%;
+            height: 400px;
+        }
+    </style>
 </head>
 <body>
     <h1>Function Prediction</h1>
@@ -17,8 +68,11 @@
 
     <button onclick="processData()">Get Prediction</button>
     <button onclick="clearInputs()">Clear Inputs</button>
+    
+    <a href="/info" target="_blank">How It Works</a>
+    
     <div id="results"></div>
-    <canvas id="myChart" width="400" height="200"></canvas>
+    <canvas id="myChart"></canvas>
 
     <script>
         let chart;  // Declare chart variable in the global scope
@@ -38,91 +92,90 @@
                 const y_input = document.getElementById('y_input').value.split(',').map(Number);
 
                 // Input validation
-                if (x_input.length == 1 || y_input.length == 1) {
-                    document.getElementById('results').innerText = 'Error: Please properly input both x and y values, make sure to use commas to seperate the values.';
-                }else if (x_input.length > 6 || y_input.length > 6) {
-                    document.getElementById('results').innerText = 'Error: Points cannot be over six.'
-                }else {
-                    const response = await fetch('/process', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ x: x_input, y: y_input })
-                    });
+                if (x_input.length !== 6 || y_input.length !== 6) {
+                    document.getElementById('results').innerText = 'Error: Please input exactly six x and y values, separated by commas.';
+                    return;
+                }
 
-                    const data = await response.json();
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ x: x_input, y: y_input })
+                });
 
-                    if (data.error) {
-                        document.getElementById('results').innerText = `Error: ${data.error}`;
-                        return;
-                    }
+                const data = await response.json();
 
-                    const { x_common, y_fit, predicted_function, function: e_function } = data.result;
-                    const resultsDiv = document.getElementById('results');
+                if (data.error) {
+                    document.getElementById('results').innerText = `Error: ${data.error}`;
+                    return;
+                }
 
-                    resultsDiv.innerHTML = `<h2>Predicted Function: ${predicted_function}</h2>`;
-                    resultsDiv.innerHTML += `<h2>Function: ${e_function}</h2>`;
+                const { x_common, y_fit, predicted_function, function: e_function } = data.result;
+                const resultsDiv = document.getElementById('results');
 
-                    // Get the bounds for the user input points
-                    const xMin = Math.min(...x_input, ...x_common) - 1;
-                    const xMax = Math.max(...x_input, ...x_common) + 1;
-                    const yMin = Math.min(...y_input, ...y_fit) - 1;
-                    const yMax = Math.max(...y_input, ...y_fit) + 1;
+                resultsDiv.innerHTML = `<h2>Predicted Function: ${predicted_function}</h2>`;
+                resultsDiv.innerHTML += `<h2>Function: ${e_function}</h2>`;
 
-                    // Update the chart or create a new one
-                    const ctx = document.getElementById('myChart').getContext('2d');
-                    if (chart) {
-                        chart.destroy();  // Destroy the existing chart before creating a new one
-                    }
-                    chart = new Chart(ctx, {
-                        type: 'scatter',
-                        data: {
-                            datasets: [
-                                {
-                                    label: 'Fitted Curve',
-                                    data: x_common.map((x, i) => ({ x, y: y_fit[i] })),
-                                    borderColor: 'blue',
-                                    fill: false,
-                                    showLine: true,
-                                    pointRadius: 0,
-                                    order: 2,
-                                },
-                                {
-                                    label: 'User Points',
-                                    data: x_input.map((x, i) => ({ x, y: y_input[i] })),
-                                    backgroundColor: 'red',
-                                    borderColor: 'red',
-                                    pointRadius: 5,  // Reduce point size
-                                    order: 1,  // Ensure user points are drawn above the fitted curve
-                                }
-                            ]
-                        },
-                        options: {
-                            scales: {
-                                x: {
-                                    type: 'linear',
-                                    position: 'bottom',
-                                    min: xMin,
-                                    max: xMax
-                                },
-                                y: {
-                                    min: yMin,
-                                    max: yMax
-                                }
+                // Get the bounds for the user input points
+                const xMin = Math.min(...x_input, ...x_common) - 1;
+                const xMax = Math.max(...x_input, ...x_common) + 1;
+                const yMin = Math.min(...y_input, ...y_fit) - 1;
+                const yMax = Math.max(...y_input, ...y_fit) + 1;
+
+                // Update the chart or create a new one
+                const ctx = document.getElementById('myChart').getContext('2d');
+                if (chart) {
+                    chart.destroy();  // Destroy the existing chart before creating a new one
+                }
+                chart = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Fitted Curve',
+                                data: x_common.map((x, i) => ({ x, y: y_fit[i] })),
+                                borderColor: 'blue',
+                                fill: false,
+                                showLine: true,
+                                pointRadius: 0,
+                                order: 2,
                             },
-                            plugins: {
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            return `(${context.raw.x}, ${context.raw.y})`;
-                                        }
+                            {
+                                label: 'User Points',
+                                data: x_input.map((x, i) => ({ x, y: y_input[i] })),
+                                backgroundColor: 'red',
+                                borderColor: 'red',
+                                pointRadius: 5,  // Reduce point size
+                                order: 1,  // Ensure user points are drawn above the fitted curve
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                min: xMin,
+                                max: xMax
+                            },
+                            y: {
+                                min: yMin,
+                                max: yMax
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return `(${context.raw.x}, ${context.raw.y})`;
                                     }
                                 }
                             }
                         }
-                    });
-                }
+                    }
+                });
             } catch (error) {
                 document.getElementById('results').innerText = `Error: ${error}`;
             }
