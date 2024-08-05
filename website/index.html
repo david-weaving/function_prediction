@@ -39,9 +39,12 @@
         button:hover {
             background-color: #218838;
         }
-        a {
-            display: block;
+        .links {
+            display: flex;
+            gap: 20px;
             margin: 20px 0;
+        }
+        a {
             color: #007bff;
             text-decoration: none;
         }
@@ -72,7 +75,10 @@
     <button onclick="processData()">Get Prediction</button>
     <button onclick="clearInputs()">Clear Inputs</button>
     
-    <a href="/info" target="_blank">How It Works</a>
+    <div class="links">
+        <a href="/info" target="_blank">How It Works</a>
+        <a href="/user_predict" target="_blank">Predict Myself</a>
+    </div>
     
     <div id="results"></div>
     <div id="fittedPointsContainer" class="chart-container">
