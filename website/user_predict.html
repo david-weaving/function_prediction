@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            padding: 2em;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 1em;
+        }
+        p {
+            line-height: 1.6;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        #myChart, #fullChart {
+            max-width: 100%;
+            height: 400px;
+        }
+        .chart-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Function Prediction</h1>
+        <p>Here you can choose which function type to fit your points to.</p>
+        
+        <label for="x_input">X values (comma separated):</label>
+        <input type="text" id="x_input" placeholder="e.g. x1, x2, x3, x4, x5, x6">
+
+        <label for="y_input">Y values (comma separated):</label>
+        <input type="text" id="y_input" placeholder="e.g. y1, y2, y3, y4, y5, y6">
+
+        <button onclick="predictFunction('poly')">Predict Polynomial</button>
+        <button onclick="predictFunction('sine')">Predict Sine</button>
+        <button onclick="predictFunction('ln')">Predict Natural Log</button>
+        <button onclick="predictFunction('exp')">Predict Exponential</button>
+        <button onclick="clearInputs()">Clear Inputs</button>
+        
+        <div id="results"></div>
+        <div id="fittedPointsContainer" class="chart-container">
+            <h2>Predicted Function with Fitted Points</h2>
+            <canvas id="myChart"></canvas>
+        </div>
+        <div id="fullFunctionContainer" class="chart-container">
+            <h2>Full Predicted Function</h2>
+            <canvas id="fullChart"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let chart, fullChart;  // Declare chart variables in the global scope
+
+        function clearInputs() {
+            document.getElementById('x_input').value = '';
+            document.getElementById('y_input').value = '';
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('fittedPointsContainer').style.display = 'none';
+            document.getElementById('fullFunctionContainer').style.display = 'none';
+            if (chart) {
+                chart.destroy();  // Destroy the existing chart
+            }
+            if (fullChart) {
+                fullChart.destroy();  // Destroy the existing full chart
+            }
+        }
+
+        function formatFunction(e_function) {
+            return e_function.replace(/x\^(\d+)/g, (match, p1) => `x<sup>${p1}</sup>`);
+        }
+
+        async function predictFunction(type) {
+            try {
+                const x_input = document.getElementById('x_input').value.split(',').map(Number);
+                const y_input = document.getElementById('y_input').value.split(',').map(Number);
+
+                // Input validation
+                if (x_input.length !== 6 || y_input.length !== 6) {
+                    document.getElementById('results').innerText = 'Error: Please input exactly six x and y values, separated by commas.';
+                    return;
+                }
+
+                const response = await fetch(`/predict_${type}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ x: x_input, y: y_input })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Request failed: ${errorText}`);
+                }
+
+                const data = await response.json();
+
+                if (data.error) {
+                    document.getElementById('results').innerText = `Error: ${data.error}`;
+                    return;
+                }
+
+                const { x_common, y_fit, function: e_function } = data.result;
+                const resultsDiv = document.getElementById('results');
+
+                const formattedFunction = formatFunction(e_function);
+                resultsDiv.innerHTML = `<h2>Function: ${formattedFunction}</h2><br>`; // Added space after function
+
+                document.getElementById('fittedPointsContainer').style.display = 'block';
+                document.getElementById('fullFunctionContainer').style.display = 'block';
+
+                // Get the bounds for the user input points
+                const xMin = Math.min(...x_input) - 1;
+                const xMax = Math.max(...x_input) + 1;
+                const yMin = Math.min(...y_input) - 1;
+                const yMax = Math.max(...y_input) + 1;
+
+                // Update the chart or create a new one for fitted points
+                const ctx = document.getElementById('myChart').getContext('2d');
+                if (chart) {
+                    chart.destroy();  // Destroy the existing chart before creating a new one
+                }
+                chart = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Fitted Curve',
+                                data: x_common.map((x, i) => ({ x, y: y_fit[i] })),
+                                borderColor: 'blue',
+                                fill: false,
+                                showLine: true,
+                                pointRadius: 0,
+                                order: 2,
+                            },
+                            {
+                                label: 'User Points',
+                                data: x_input.map((x, i) => ({ x, y: y_input[i] })),
+                                backgroundColor: 'red',
+                                borderColor: 'red',
+                                pointRadius: 5,  // Reduce point size
+                                order: 1,  // Ensure user points are drawn above the fitted curve
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                min: xMin,
+                                max: xMax,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)',
+                                    borderColor: 'black',
+                                    borderWidth: 2,
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'X Axis',
+                                    font: {
+                                        size: 16
+                                    }
+                                },
+                                ticks: {
+                                    color: '#000', // Black color for x-axis labels
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            y: {
+                                min: yMin,
+                                max: yMax,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)',
+                                    borderColor: 'black',
+                                    borderWidth: 2,
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Y Axis',
+                                    font: {
+                                        size: 16
+                                    }
+                                },
+                                ticks: {
+                                    color: '#000', // Black color for y-axis labels
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return `(${context.raw.x}, ${context.raw.y})`;
+                                    }
+                                }
+                            },
+                            legend: {
+                                labels: {
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            }
+                        },
+                        elements: {
+                            point: {
+                                pointStyle: 'circle'
+                            }
+                        }
+                    }
+                });
+
+                // Get the bounds for the full predicted function
+                const fullXMin = Math.min(...x_common) - 1;
+                const fullXMax = Math.max(...x_common) + 1;
+                const fullYMin = Math.min(...y_fit) - 1;
+                const fullYMax = Math.max(...y_fit) + 1;
+
+                // Update the full chart
+                const fullCtx = document.getElementById('fullChart').getContext('2d');
+                if (fullChart) {
+                    fullChart.destroy();  // Destroy the existing chart before creating a new one
+                }
+                fullChart = new Chart(fullCtx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Full Predicted Function',
+                                data: x_common.map((x, i) => ({ x, y: y_fit[i] })),
+                                borderColor: 'blue',
+                                fill: false,
+                                showLine: true,
+                                pointRadius: 0,
+                                order: 2,
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                min: fullXMin,
+                                max: fullXMax,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)',
+                                    borderColor: 'black',
+                                    borderWidth: 2,
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'X Axis',
+                                    font: {
+                                        size: 16
+                                    }
+                                },
+                                ticks: {
+                                    color: '#000', // Black color for x-axis labels
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            y: {
+                                min: fullYMin,
+                                max: fullYMax,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)',
+                                    borderColor: 'black',
+                                    borderWidth: 2,
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Y Axis',
+                                    font: {
+                                        size: 16
+                                    }
+                                },
+                                ticks: {
+                                    color: '#000', // Black color for y-axis labels
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return `(${context.raw.x}, ${context.raw.y})`;
+                                    }
+                                }
+                            },
+                            legend: {
+                                labels: {
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            }
+                        },
+                        elements: {
+                            point: {
+                                pointStyle: 'circle'
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                document.getElementById('results').innerText = `Error: ${error}`;
+            }
+        }
+    </script>
+</body>
+</html>
