@@ -12,36 +12,80 @@ def serve_html():
 def serve_info():
     return send_from_directory('.', 'info.html')
 
-@app.route('/process', methods=['POST'])
-def process():
+@app.route('/user_predict')
+def serve_user():
+    return send_from_directory('.', 'user_predict.html')
+
+@app.route('/predict_poly', methods=['POST'])
+def poly_p():
     try:
         data = request.json
         x = data['x']
         y = data['y']
-        predicted_function = func_web.predict_function(x, y)
-        x_common, y_fit, e_function = [], [], ""
-
-        if predicted_function == "polynomial":
-            x_common, y_fit, e_function = func_web.poly_average(x, y, 3)  # example degree
-        elif predicted_function == "sine":
-            x_common, y_fit, e_function = func_web.sine_average(x, y)
-        elif predicted_function == "exponential":
-            x_common, y_fit, e_function = func_web.exp_average(x, y)
-        elif predicted_function == "ln":
-            x_common, y_fit, e_function = func_web.ln_average(x, y)
-        else:
-            return jsonify({"error": "Unknown function type"})
+        x_common, y_fit, e_function = func_web.poly_average(x, y, 3)
 
         return jsonify({
             "result": {
                 "x_common": x_common,
                 "y_fit": y_fit,
-                "predicted_function": predicted_function,
                 "function": e_function
             }
         })
     except Exception as e:
-        print(f"Error in process: {e}")
+        return jsonify({"error": str(e)})
+
+@app.route('/predict_sine', methods=['POST'])
+def sine_p():
+    try:
+        data = request.json
+        x = data['x']
+        y = data['y']
+        x_common, y_fit, e_function = func_web.sine_average(x, y)
+
+        return jsonify({
+            "result": {
+                "x_common": x_common,
+                "y_fit": y_fit,
+                "function": e_function
+            }
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+@app.route('/predict_ln', methods=['POST'])
+def ln_p():
+    try:
+        data = request.json
+        x = data['x']
+        y = data['y']
+        x_common, y_fit, e_function = func_web.ln_average(x, y)
+
+        return jsonify({
+            "result": {
+                "x_common": x_common,
+                "y_fit": y_fit,
+                "function": e_function
+            }
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+@app.route('/predict_exp', methods=['POST'])
+def exp_p():
+    try:
+        data = request.json
+        x = data['x']
+        y = data['y']
+        x_common, y_fit, e_function = func_web.exp_average(x, y)
+
+        return jsonify({
+            "result": {
+                "x_common": x_common,
+                "y_fit": y_fit,
+                "function": e_function
+            }
+        })
+    except Exception as e:
         return jsonify({"error": str(e)})
 
 if __name__ == '__main__':
