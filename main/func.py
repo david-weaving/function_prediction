@@ -4,7 +4,21 @@ import itertools
 from scipy.optimize import curve_fit
 import tensorflow as tf
 
+def sort_array(x,y):
+    # Combine the arrays using zip
+    combined = list(zip(x, y))
 
+    # Sort the combined list by the first element (elements of x)
+    sorted_combined = sorted(combined, key=lambda pair: pair[0])
+
+    # Unzip the combined list back into two separate lists
+    x_sorted, y_sorted = zip(*sorted_combined)
+
+    # Convert the tuples back to lists
+    x_sorted = list(x_sorted)
+    y_sorted = list(y_sorted)
+
+    return x_sorted, y_sorted
 
 def rearrange_arrays(array1, array2):
     # Step 1: Combine and sort arrays
@@ -486,8 +500,11 @@ def ln_average(x,y):
     plt.show()
 
 def predict_function(x,y): # predicts funtion
-        
-    model = tf.keras.models.load_model("models/model_V1_7.h5")
+    
+    x,y = sort_array(x,y)
+    print(x)
+    print(y)
+    model = tf.keras.models.load_model("C:/Users/david/OneDrive/Desktop/function_prediction/models/model_V1_7.h5")
 
     points = list(zip(x, y))
     print(points)
