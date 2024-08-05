@@ -206,7 +206,10 @@ x_train = np.array([[(1,1),(2,2),(3,3),(4,4),(5,5),(6,6)],
                     [(1.21, 0.04), (2.94, 2.0), (4.34, 0.05), (4.66, 0.05), (5.03, 0.51), (6.78, 1.15)],[(-1.7, 2.59), (-0.89, 3.79), (2.21, 0.25), (5.62, 3.95), (6.46, 3.64), (6.48, 3.62)],
                     [(-4.98, 1864.69), (-4.32, 1195.32), (-2.91, 174.91), (0.77, 3.27), (1.73, 9.77), (3.98, 426.45)],[(-4.58, 1127.68), (-2.33, 79.37), (-0.89, 0.97), (1.45, 5.08), (3.02, 151.92), (4.78, 1061.36)],
                     [(0, -2.0), (1, -0.66), (2, 1.84), (3, 0.92), (4, -2.54), (5, -0.72)],[(0.31, 3.48), (2.73, 0.0), (3.97, 1.38), (5.01, 3.33), (5.03, 3.36), (5.82, 4.0)],[(1, 11), (2, 12), (3, 13), (4, 12), (5, 11), (6, 10)],
-                    [(1, 7), (4, 9), (6, 13), (8, 14), (9, 9), (10, 7)],[(-2.0, 3.0), (-1.0, -6.0), (0.0, -5.0), (1.0, 0.0), (2.0, 9.0), (3.0, 22.0)]])
+                    [(1, 7), (4, 9), (6, 13), (8, 14), (9, 9), (10, 7)],[(-2.0, 3.0), (-1.0, -6.0), (0.0, -5.0), (1.0, 0.0), (2.0, 9.0), (3.0, 22.0)],[(0.0, 4.12), (1.0, 0.75), (2.0, -0.97), (3.0, 1.62), (4.0, 4.12), (5.0, 0.75)],
+                    [(1, 4), (2, 78), (3, 100), (4, 34), (5, 90), (6, 14)],[(2, 5), (4, 6), (45, 1), (67, 2), (89, 3), (130, 4)],[(1, 1), (5, 20), (6, 30), (7, 4), (9, 5), (15, 60)],
+                    [(5.5, 20), (6.7, 30), (7, 4), (9.7, 5), (10, 1), (15, 60)],[(5.5, 44), (6.7, 33), (7, 11.3), (9.7, 4.4), (10, 70), (15, 6)],[(55, 3), (77, 33.5), (86, 445), (101.4, 105), (313, 77), (543, 70)],
+                    [(2.3, 6), (3, 2), (5, 3), (12, 1), (14.5, 5), (19, 4)],[(-44, 0.3), (-33, 50.5), (0.54, 13), (23, 3), (33.5, 10), (66, 45)]])
 
 
 y_train = np.array([["polynomial"], ["polynomial"], ["exponential"],["exponential"],["polynomial"],["polynomial"],["exponential"],["exponential"],["polynomial"],
@@ -237,6 +240,7 @@ y_train = np.array([["polynomial"], ["polynomial"], ["exponential"],["exponentia
                     ["polynomial"],["ln"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["sine"],["sine"],["sine"],["sine"],["ln"],["ln"],["ln"],["ln"],["ln"],["ln"],["ln"],["ln"],["ln"],
                     ["ln"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],
                     ["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["sine"],["sine"],["sine"],["exponential"],["polynomial"],["sine"],["exponential"],
-                    ["polynomial"],["exponential"],["sine"],["sine"],["sine"],["sine"],["sine"],["polynomial"],["polynomial"],["sine"],["sine"],["sine"],["sine"],["polynomial"]])
+                    ["polynomial"],["exponential"],["sine"],["sine"],["sine"],["sine"],["sine"],["polynomial"],["polynomial"],["sine"],["sine"],["sine"],["sine"],["polynomial"],["sine"],["polynomial"],["polynomial"],["polynomial"],
+                    ["polynomial"],["polynomial"],["polynomial"],["polynomial"],["sine"]])
 
 
