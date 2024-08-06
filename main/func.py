@@ -504,7 +504,7 @@ def predict_function(x,y): # predicts funtion
     x,y = sort_array(x,y)
     print(x)
     print(y)
-    model = tf.keras.models.load_model("C:/Users/david/OneDrive/Desktop/function_prediction/models/model_V1_7.h5")
+    model = tf.keras.models.load_model("C:/Users/Administrator/func pred/function_prediction/models/model_V1_8.h5")
 
     points = list(zip(x, y))
     print(points)
