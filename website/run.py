@@ -11,6 +11,8 @@ tf.config.set_visible_devices([], 'GPU')
 
 app = Flask(__name__)
 
+model = tf.keras.models.load_model("C:/Users/david/OneDrive/Desktop/function_prediction/models/model_V1_8.h5")
+
 @app.route('/')
 def serve_html():
     return send_from_directory('.', 'index.html')
@@ -106,7 +108,7 @@ def process():
         data = request.json
         x = data['x']
         y = data['y']
-        predicted_function = func_web.predict_function(x, y)
+        predicted_function = func_web.predict_function(x, y, model)
         x_common, y_fit, e_function = [], [], ""
 
         if predicted_function == "polynomial":
