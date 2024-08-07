@@ -213,7 +213,7 @@ x_train = np.array([[(1,1),(2,2),(3,3),(4,4),(5,5),(6,6)],
                     [(0.5, 1), (1.0, 2), (1.5, 3), (2.0, 4), (2.5, 5), (3.0, 6)],[(1, 1), (2, 2), (3, 1), (4, 2), (5, 1), (6, 2)],[(4.2, 1), (7, 1), (7, 1), (8, 2), (10, 2), (21.2, 2)],
                     [(4.2, 1), (7, 1), (7, 1), (8, 2), (10, 2), (21.2, 2)],[(1, 1), (2, 2), (3, 1), (4, 2), (5, 1), (6, 2)],[(4.2, 1), (7, 1), (7, 1), (8, 2), (10, 2), (21.2, 2)],
                     [(4.2, 1), (7, 1), (7, 1), (8, 2), (10, 2), (21.2, 2)],[(4.2, 1), (7, 1), (7, 1), (8, 2), (10, 2), (21.2, 2)],[(4.2, 1), (7, 1), (7, 1), (8, 2), (10, 2), (21.2, 2)],
-                    [(1, 6), (2, 5), (3, 4), (4, 3), (5, 2), (6, 1)]])
+                    [(1, 6), (2, 5), (3, 4), (4, 3), (5, 2), (6, 1)],[(1, 5), (2, 4), (3, 5), (4, 6), (5, 7), (6, 3)]])
 
 
 y_train = np.array([["polynomial"], ["polynomial"], ["exponential"],["exponential"],["polynomial"],["polynomial"],["exponential"],["exponential"],["polynomial"],
@@ -246,6 +246,6 @@ y_train = np.array([["polynomial"], ["polynomial"], ["exponential"],["exponentia
                     ["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["exponential"],["sine"],["sine"],["sine"],["exponential"],["polynomial"],["sine"],["exponential"],
                     ["polynomial"],["exponential"],["sine"],["sine"],["sine"],["sine"],["sine"],["polynomial"],["polynomial"],["sine"],["sine"],["sine"],["sine"],["polynomial"],["sine"],["polynomial"],["polynomial"],["polynomial"],
                     ["polynomial"],["polynomial"],["polynomial"],["polynomial"],["sine"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],["polynomial"],
-                    ["polynomial"],["polynomial"],["polynomial"],["polynomial"]])
+                    ["polynomial"],["polynomial"],["polynomial"],["polynomial"],["sine"]])
 
 
