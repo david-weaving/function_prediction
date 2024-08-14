@@ -12,26 +12,31 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
+            padding-bottom: 40px;
             background-color: #f4f4f9;
             color: #333;
         }
         h1 {
-            text-align: center;
+            text-align: center;  /* This centers the h1 element */
+        }
+        h2 {
+            margin-top: 0;
         }
         label {
             display: block;
             margin: 10px 0 5px;
         }
         input {
-            width: calc(100% - 20px);
+            width: 100%;
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            box-sizing: border-box;
         }
         button {
             padding: 10px 15px;
-            margin: 5px;
+            margin: 5px 5px 5px 0;
             border: none;
             background-color: #28a745;
             color: white;
@@ -42,57 +47,93 @@
             background-color: #218838;
         }
         .links {
-            display: flex;
-            gap: 20px;
             margin: 20px 0;
         }
-        a {
+        .links a {
             color: #007bff;
             text-decoration: none;
+            margin-right: 20px;
         }
-        a:hover {
+        .links a:hover {
             text-decoration: underline;
         }
         #results {
             margin-top: 20px;
         }
-        #myChart, #fullChart {
-            max-width: 100%;
-            height: 400px;
-        }
         .chart-container {
             display: none;
+            margin-top: 20px;
+            width: 100%;
         }
-        .spacing {
-            height: 40px;
+        .jxgbox {
+            width: 100% !important;
+            height: 1200px !important;
+            margin: 0 auto;
+        }
+        #fittedPointsContainer {
+            margin-bottom: 40px;
+        }
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .zoom-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .zoom-button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .zoom-button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
+
     <h1>Function Prediction</h1>
 
     <label for="x_input">X values (comma separated):</label>
-    <input type="text" id="x_input" placeholder="e.g. x1, x2, x3, x4, x5, x6">
+    <input type="text" id="x_input" placeholder="e.g. 1,2,3,4,5,6">
 
     <label for="y_input">Y values (comma separated):</label>
-    <input type="text" id="y_input" placeholder="e.g. y1, y2, y3, y4, y5, y6">
+    <input type="text" id="y_input" placeholder="e.g. 1,2,3,4,5,6">
 
     <button onclick="processData()">Get Prediction</button>
     <button onclick="clearInputs()">Clear Inputs</button>
 
     <div class="links">
-        <a href="/info" target="_blank">How It Works</a>
-        <a href="/user_predict" target="_blank">Predict Myself</a>
+        <a href="/info">How It Works</a>
+        <a href="/user_predict">Predict Myself</a>
     </div>
     
     <div id="results"></div>
     <div id="fittedPointsContainer" class="chart-container">
-        <h2>Predicted Function with Fitted Points</h2>
-        <div id="jxgbox" class="jxgbox" style="width:600px; height:400px;"></div>
+        <div class="chart-header">
+            <h2>Predicted Function with Fitted Points</h2>
+            <div class="zoom-buttons">
+                <button class="zoom-button" onclick="zoomIn('board')">Zoom In</button>
+                <button class="zoom-button" onclick="zoomOut('board')">Zoom Out</button>
+            </div>
+        </div>
+        <div id="jxgbox" class="jxgbox"></div>
     </div>
     <div id="fullFunctionContainer" class="chart-container">
-        <h2>Full Predicted Function</h2>
-        <div id="fullJxgbox" class="jxgbox" style="width:600px; height:400px;"></div>
+        <div class="chart-header">
+            <h2>Full Predicted Function</h2>
+            <div class="zoom-buttons">
+                <button class="zoom-button" onclick="zoomIn('fullBoard')">Zoom In</button>
+                <button class="zoom-button" onclick="zoomOut('fullBoard')">Zoom Out</button>
+            </div>
+        </div>
+        <div id="fullJxgbox" class="jxgbox"></div>
     </div>
 
     <script>
@@ -142,6 +183,22 @@
                 console.error("Error creating function:", error);
                 // Return a default function that always returns 0
                 return () => 0;
+            }
+        }
+
+        function zoomIn(boardName) {
+            if (boardName === 'board' && board) {
+                board.zoomIn();
+            } else if (boardName === 'fullBoard' && fullBoard) {
+                fullBoard.zoomIn();
+            }
+        }
+
+        function zoomOut(boardName) {
+            if (boardName === 'board' && board) {
+                board.zoomOut();
+            } else if (boardName === 'fullBoard' && fullBoard) {
+                fullBoard.zoomOut();
             }
         }
     
@@ -201,7 +258,18 @@
                 }
                 board = JXG.JSXGraph.initBoard('jxgbox', {
                     boundingbox: [Math.min(...x_input) - 1, Math.max(...y_input) + 1, Math.max(...x_input) + 1, Math.min(...y_input) - 1],
-                    axis: true
+                    axis: true,
+                    keepaspectratio: false,
+                    showNavigation: false,
+                    zoom: {
+                        wheel: false,
+                        needshift: false,
+                        eps: 0.1
+                    },
+                    pan: {
+                        enabled: true,
+                        needshift: false
+                    }
                 });
 
                 // Plot user points
@@ -214,9 +282,8 @@
 
                 // Plot all fitted points
                 const fittedPoints = board.create('curve', [x_common, y_fit], {
-                    strokeColor: 'green',
+                    strokeColor: 'blue',
                     strokeWidth: 2,
-                    dash: 2
                 });
 
                 // Plot full function
@@ -224,17 +291,27 @@
                     JXG.JSXGraph.freeBoard(fullBoard);
                 }
                 fullBoard = JXG.JSXGraph.initBoard('fullJxgbox', {
-                    boundingbox: [Math.min(...x_common) - 1, Math.max(...y_fit) + 1, Math.max(...x_common) + 1, Math.min(...y_fit) - 1],
-                    axis: true
+                    boundingbox: [-100, 100, 100, -100],
+                    axis: true,
+                    showNavigation: false,
+                    zoom: {
+                        wheel: false,
+                        needshift: false,
+                        eps: 0.1
+                    },
+                    pan: {
+                        enabled: true,
+                        needshift: false
+                    },
+                    keepaspectratio: false
                 });
 
                 fullBoard.create('functiongraph', [predictedFunc], {strokeColor: 'blue'});
 
                 // Plot all fitted points on full function graph
                 const fullFittedPoints = fullBoard.create('curve', [x_common, y_fit], {
-                    strokeColor: 'green',
+                    strokeColor: 'blue',
                     strokeWidth: 2,
-                    dash: 2
                 });
 
             } catch (error) {
