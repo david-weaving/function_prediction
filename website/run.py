@@ -11,7 +11,8 @@ tf.config.set_visible_devices([], 'GPU')
 
 app = Flask(__name__)
 
-model = tf.keras.models.load_model("C:/Users/david/OneDrive/Desktop/function_prediction/models/model_V1_8.h5")
+model = tf.keras.models.load_model("C:/Users/Administrator/func pred/function_prediction/models/model_V1_8.h5")
+model_degree =tf.keras.models.load_model("C:/Users/Administrator/func pred/function_prediction/models/model_degree_V1.h5")
 
 @app.route('/')
 def serve_html():
@@ -20,6 +21,10 @@ def serve_html():
 @app.route('/info')
 def serve_info():
     return send_from_directory('.', 'info.html')
+
+@app.route('/index')
+def index():
+    return send_from_directory('.', 'index.html')
 
 @app.route('/user_predict')
 def serve_user():
@@ -112,7 +117,8 @@ def process():
         x_common, y_fit, e_function = [], [], ""
 
         if predicted_function == "polynomial":
-            x_common, y_fit, e_function = func_web.poly_average(x, y, 3)  # example degree
+            degree = func_web.predict_degree(x,y, model_degree)
+            x_common, y_fit, e_function = func_web.poly_average(x, y, degree)  # example degree
         elif predicted_function == "sine":
             x_common, y_fit, e_function = func_web.sine_average(x, y)
         elif predicted_function == "exponential":
