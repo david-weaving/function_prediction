@@ -131,6 +131,8 @@ FOR THE WEBSITE: USE THE EXP FUNCTION AS A REFERENCE TO MODEL THE REST.
 
 VERY IMPORTANT! HOW TO USE PYTHONANYWHERE:
 
+(user install all the pips)
+
 Activate Virtual Learning Environment:
 python3.10 -m venv venv
 source venv/bin/activate
@@ -141,4 +143,20 @@ python run.py  (runs the main)
 
 Using pythonanwhere to host the website ($6 a month), then bought a domain on square space ($20 yearly) name for the website:  https://www.functionprediction.com/
 
+08/14/24
+
+Lots of updates since I last logged: New graph, better interface, added in the degree predictor.
+
+WARNING: If the SINE functions are too slow to predict or stop outputting, I increased the number of plots between points from 400 to 1000
+
+TO DO:
+Train better data on degree predictor (will take time)
+
+Improve "How it works page"
+
+Create labels for the graph
+
+For later (ambitious, not guaranteed):
+
+Create page where the user simply clicks their points on a graph and it fits them.
 
