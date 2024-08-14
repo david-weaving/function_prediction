@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Function Prediction</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://jsxgraph.org/distrib/jsxgraph.css" />
+    <script type="text/javascript" src="https://jsxgraph.org/distrib/jsxgraphcore.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,12 +52,39 @@
         #results {
             margin-top: 20px;
         }
-        #myChart, #fullChart {
-            max-width: 100%;
-            height: 400px;
-        }
         .chart-container {
             display: none;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .jxgbox {
+            width: 100% !important;
+            height: 1200px !important;
+            margin: 0 auto;
+        }
+        #fittedPointsContainer {
+            margin-bottom: 40px;
+        }
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .zoom-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .zoom-button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .zoom-button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -85,19 +113,48 @@
     <button onclick="predictLn()">Predict Natural Log</button>
     <button onclick="predictExponential()">Predict Exponential</button>
     <button onclick="clearInputs()">Clear Inputs</button>
-    
+    <div class="links">
+        <a href="/index">Back To Prediction</a>
+    </div>
     <div id="results"></div>
     <div id="fittedPointsContainer" class="chart-container">
-        <h2>Predicted Function with Fitted Points</h2>
-        <canvas id="myChart"></canvas>
+        <div class="chart-header">
+            <h2>Predicted Function with Fitted Points</h2>
+            <div class="zoom-buttons">
+                <button class="zoom-button" onclick="zoomIn('board')">Zoom In</button>
+                <button class="zoom-button" onclick="zoomOut('board')">Zoom Out</button>
+            </div>
+        </div>
+        <div id="jxgbox" class="jxgbox"></div>
     </div>
     <div id="fullFunctionContainer" class="chart-container">
-        <h2>Full Predicted Function</h2>
-        <canvas id="fullChart"></canvas>
+        <div class="chart-header">
+            <h2>Full Predicted Function</h2>
+            <div class="zoom-buttons">
+                <button class="zoom-button" onclick="zoomIn('fullBoard')">Zoom In</button>
+                <button class="zoom-button" onclick="zoomOut('fullBoard')">Zoom Out</button>
+            </div>
+        </div>
+        <div id="fullJxgbox" class="jxgbox"></div>
     </div>
 
     <script>
-        let chart, fullChart;  // Declare chart variables in the global scope
+        let board, fullBoard;
+
+        function createPredictedFunction(e_function) {
+            console.log("Creating function for:", e_function);
+            try {
+                // Replace '^' with 'Math.pow()' for exponentiation
+                const jsFunction = e_function.replace(/x\^(\d+)/g, 'Math.pow(x, $1)');
+                // Replace scientific notation
+                const cleanedFunction = jsFunction.replace(/e(-?\d+)/g, '* Math.pow(10, $1)');
+                console.log("Cleaned function:", cleanedFunction);
+                return new Function('x', `return ${cleanedFunction}`);
+            } catch (error) {
+                console.error("Error creating function:", error);
+                return () => 0;
+            }
+        }
 
         function clearInputs() {
             document.getElementById('x_input').value = '';
@@ -105,16 +162,32 @@
             document.getElementById('results').innerHTML = '';
             document.getElementById('fittedPointsContainer').style.display = 'none';
             document.getElementById('fullFunctionContainer').style.display = 'none';
-            if (chart) {
-                chart.destroy();  // Destroy the existing chart
+            if (board) {
+                JXG.JSXGraph.freeBoard(board);
             }
-            if (fullChart) {
-                fullChart.destroy();  // Destroy the existing full chart
+            if (fullBoard) {
+                JXG.JSXGraph.freeBoard(fullBoard);
             }
         }
 
         function formatFunction(e_function) {
             return e_function.replace(/x\^(\d+)/g, (match, p1) => `x<sup>${p1}</sup>`);
+        }
+
+        function zoomIn(boardName) {
+            if (boardName === 'board' && board) {
+                board.zoomIn();
+            } else if (boardName === 'fullBoard' && fullBoard) {
+                fullBoard.zoomIn();
+            }
+        }
+
+        function zoomOut(boardName) {
+            if (boardName === 'board' && board) {
+                board.zoomOut();
+            } else if (boardName === 'fullBoard' && fullBoard) {
+                fullBoard.zoomOut();
+            }
         }
 
         async function predictPolynomial() {
@@ -135,254 +208,132 @@
         }
 
         async function processData(endpoint, additionalData = {}) {
-            try {
-                const x_input = document.getElementById('x_input').value.split(',').map(Number);
-                const y_input = document.getElementById('y_input').value.split(',').map(Number);
+    try {
+        const x_input = document.getElementById('x_input').value.trim();
+        const y_input = document.getElementById('y_input').value.trim();
 
-                // Input validation
-                if (x_input.length == 0 || y_input.length == 0) {
-                    document.getElementById('results').innerText = 'Error: Please enter both the same number of x and y values, separated by commas.';
-                    return;
-                }
-                if (x_input.length !== y_input.length){
-                    document.getElementById('results').innerText = 'Error: Please enter both the same number of x and y values, separated by commas.';
-                    return;
-                }
-
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ x: x_input, y: y_input, ...additionalData })
-                });
-
-                const data = await response.json();
-
-                if (data.error) {
-                    document.getElementById('results').innerText = `Error: ${data.error}`;
-                    return;
-                }
-
-                const { x_common, y_fit, function: e_function } = data.result;
-                const resultsDiv = document.getElementById('results');
-
-                const formattedFunction = formatFunction(e_function);
-                resultsDiv.innerHTML = `<h2>Function: ${formattedFunction}</h2><br>`; // Added space after function
-
-                document.getElementById('fittedPointsContainer').style.display = 'block';
-                document.getElementById('fullFunctionContainer').style.display = 'block';
-
-                // Get the bounds for the user input points
-                const xMin = Math.min(...x_input) - 1;
-                const xMax = Math.max(...x_input) + 1;
-                const yMin = Math.min(...y_input) - 1;
-                const yMax = Math.max(...y_input) + 1;
-
-                // Update the chart or create a new one for fitted points
-                const ctx = document.getElementById('myChart').getContext('2d');
-                if (chart) {
-                    chart.destroy();  // Destroy the existing chart before creating a new one
-                }
-                chart = new Chart(ctx, {
-                    type: 'scatter',
-                    data: {
-                        datasets: [
-                            {
-                                label: 'Fitted Curve',
-                                data: x_common.map((x, i) => ({ x, y: y_fit[i] })),
-                                borderColor: 'blue',
-                                fill: false,
-                                showLine: true,
-                                pointRadius: 0,
-                                order: 2,
-                            },
-                            {
-                                label: 'User Points',
-                                data: x_input.map((x, i) => ({ x, y: y_input[i] })),
-                                backgroundColor: 'red',
-                                borderColor: 'red',
-                                pointRadius: 5,  // Reduce point size
-                                order: 1,  // Ensure user points are drawn above the fitted curve
-                            }
-                        ]
-                    },
-                    options: {
-                        scales: {
-                            x: {
-                                type: 'linear',
-                                position: 'bottom',
-                                min: xMin,
-                                max: xMax,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.1)',
-                                    borderColor: 'black',
-                                    borderWidth: 2,
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'X Axis',
-                                    font: {
-                                        size: 16
-                                    }
-                                },
-                                ticks: {
-                                    color: '#000', // Black color for x-axis labels
-                                    font: {
-                                        weight: 'bold'
-                                    }
-                                }
-                            },
-                            y: {
-                                min: yMin,
-                                max: yMax,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.1)',
-                                    borderColor: 'black',
-                                    borderWidth: 2,
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Y Axis',
-                                    font: {
-                                        size: 16
-                                    }
-                                },
-                                ticks: {
-                                    color: '#000', // Black color for y-axis labels
-                                    font: {
-                                        weight: 'bold'
-                                    }
-                                }
-                            }
-                        },
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function (context) {
-                                        return `(${context.raw.x}, ${context.raw.y})`;
-                                    }
-                                }
-                            },
-                            legend: {
-                                labels: {
-                                    font: {
-                                        size: 14
-                                    }
-                                }
-                            }
-                        },
-                        elements: {
-                            point: {
-                                pointStyle: 'circle'
-                            }
-                        }
-                    }
-                });
-
-                // Get the bounds for the full predicted function
-                const fullXMin = Math.min(...x_common) - 1;
-                const fullXMax = Math.max(...x_common) + 1;
-                const fullYMin = Math.min(...y_fit) - 1;
-                const fullYMax = Math.max(...y_fit) + 1;
-
-                // Update the full chart
-                const fullCtx = document.getElementById('fullChart').getContext('2d');
-                if (fullChart) {
-                    fullChart.destroy();  // Destroy the existing chart before creating a new one
-                }
-                fullChart = new Chart(fullCtx, {
-                    type: 'scatter',
-                    data: {
-                        datasets: [
-                            {
-                                label: 'Full Predicted Function',
-                                data: x_common.map((x, i) => ({ x, y: y_fit[i] })),
-                                borderColor: 'blue',
-                                fill: false,
-                                showLine: true,
-                                pointRadius: 0,
-                                order: 2,
-                            }
-                        ]
-                    },
-                    options: {
-                        scales: {
-                            x: {
-                                type: 'linear',
-                                position: 'bottom',
-                                min: fullXMin,
-                                max: fullXMax,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.1)',
-                                    borderColor: 'black',
-                                    borderWidth: 2,
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'X Axis',
-                                    font: {
-                                        size: 16
-                                    }
-                                },
-                                ticks: {
-                                    color: '#000', // Black color for x-axis labels
-                                    font: {
-                                        weight: 'bold'
-                                    }
-                                }
-                            },
-                            y: {
-                                min: fullYMin,
-                                max: fullYMax,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.1)',
-                                    borderColor: 'black',
-                                    borderWidth: 2,
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Y Axis',
-                                    font: {
-                                        size: 16
-                                    }
-                                },
-                                ticks: {
-                                    color: '#000', // Black color for y-axis labels
-                                    font: {
-                                        weight: 'bold'
-                                    }
-                                }
-                            }
-                        },
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function (context) {
-                                        return `(${context.raw.x}, ${context.raw.y})`;
-                                    }
-                                }
-                            },
-                            legend: {
-                                labels: {
-                                    font: {
-                                        size: 14
-                                    }
-                                }
-                            }
-                        },
-                        elements: {
-                            point: {
-                                pointStyle: 'circle'
-                            }
-                        }
-                    }
-                });
-
-            } catch (error) {
-                document.getElementById('results').innerText = `Error: ${error}`;
-            }
+        // Check if inputs are empty
+        if (x_input === '' || y_input === '') {
+            document.getElementById('results').innerText = 'Error: Please enter both x and y values.';
+            return;
         }
+
+        const x_values = x_input.split(',').map(Number);
+        const y_values = y_input.split(',').map(Number);
+
+        // Check if number of x and y values are equal
+        if (x_values.length !== y_values.length) {
+            document.getElementById('results').innerText = 'Error: The number of x values must match the number of y values.';
+            return;
+        }
+
+        // Check if there are any NaN values
+        if (x_values.some(isNaN) || y_values.some(isNaN)) {
+            document.getElementById('results').innerText = 'Error: Please enter valid numbers for all x and y values.';
+            return;
+        }
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ x: x_values, y: y_values, ...additionalData })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            document.getElementById('results').innerText = `Error: ${data.error}`;
+            return;
+        }
+
+        const { x_common, y_fit, function: e_function } = data.result;
+        const resultsDiv = document.getElementById('results');
+
+        const formattedFunction = formatFunction(e_function);
+        resultsDiv.innerHTML = `<h2>Function: ${formattedFunction}</h2><br>`;
+
+        document.getElementById('fittedPointsContainer').style.display = 'block';
+        document.getElementById('fullFunctionContainer').style.display = 'block';
+
+        const predictedFunc = createPredictedFunction(e_function);
+
+        // Add a check to ensure the function is valid
+        if (typeof predictedFunc !== 'function') {
+            throw new Error('Failed to create a valid function');
+        }
+
+        // Plot fitted points
+        if (board) {
+            JXG.JSXGraph.freeBoard(board);
+        }
+        board = JXG.JSXGraph.initBoard('jxgbox', {
+            boundingbox: [Math.min(...x_values) - 1, Math.max(...y_values) + 1, Math.max(...x_values) + 1, Math.min(...y_values) - 1],
+            axis: true,
+            keepaspectratio: false,
+            showNavigation: false,
+            zoom: {
+                wheel: false,
+                needshift: false,
+                eps: 0.1
+            },
+            pan: {
+                enabled: true,
+                needshift: false
+            }
+        });
+
+        // Plot user points
+        x_values.forEach((x, i) => {
+            board.create('point', [x, y_values[i]], {name: '', fixed: true, fillColor: 'red', strokeColor: 'red'});
+        });
+
+        // Plot fitted curve
+        board.create('functiongraph', [predictedFunc], {strokeColor: 'blue'});
+
+        // Plot all fitted points
+        board.create('curve', [x_common, y_fit], {
+            strokeColor: 'blue',
+            strokeWidth: 2,
+        });
+
+        // Plot full function
+        if (fullBoard) {
+            JXG.JSXGraph.freeBoard(fullBoard);
+        }
+        fullBoard = JXG.JSXGraph.initBoard('fullJxgbox', {
+            boundingbox: [-100, 100, 100, -100],
+            axis: true,
+            showNavigation: false,
+            zoom: {
+                wheel: false,
+                needshift: false,
+                eps: 0.1
+            },
+            pan: {
+                enabled: true,
+                needshift: false
+            },
+            keepaspectratio: false
+        });
+
+        fullBoard.create('functiongraph', [predictedFunc], {strokeColor: 'blue'});
+
+        // Plot all fitted points on full function graph
+        fullBoard.create('curve', [x_common, y_fit], {
+            strokeColor: 'blue',
+            strokeWidth: 2,
+        });
+
+    } catch (error) {
+        console.error("Error in processData:", error);
+        document.getElementById('results').innerText = `Error: ${error.message}`;
+        // Clear the charts if there's an error
+        document.getElementById('fittedPointsContainer').style.display = 'none';
+        document.getElementById('fullFunctionContainer').style.display = 'none';
+    }
+}
     </script>
 </body>
 </html>
