@@ -93,8 +93,8 @@ def poly_average(x,y,degree):
     x_common = np.linspace(x_min, x_max, 400)
 
     # continue the graph
-    x_forward = np.linspace(x_max+0.1, 50, 400)
-    x_backward = np.linspace(-50, x_min-0.1, 400)
+    x_forward = np.linspace(x_max+0.1, 150, 400)
+    x_backward = np.linspace(-150, x_min-0.1, 400)
     x_common = np.append(x_common, x_forward)
     x_common = np.insert(x_common, 0, x_backward)
 
@@ -138,7 +138,7 @@ def exp_average(x, y):
 
     # fit the model to the data
     try:
-        params, _ = curve_fit(exp_model, x, y, p0=initial_guess(x, y), maxfev=3000) # returns the coeffs
+        params, _ = curve_fit(exp_model, x, y, p0=initial_guess(x, y), maxfev=10000) # returns the coeffs
     except RuntimeError as e:
         print(f"Error fitting data: {e}")
         return
@@ -148,6 +148,12 @@ def exp_average(x, y):
     
     # create our function
     x_common = np.linspace(np.min(x), np.max(x), 400)
+
+    x_forward = np.linspace(np.max(x)+0.1, 150, 400)
+    x_backward = np.linspace(-150, np.min(x)-0.1, 400)
+    x_common = np.append(x_common, x_forward)
+    x_common = np.insert(x_common, 0, x_backward)
+
     y_fit = exp_model(x_common, A_fit, b_fit, C_fit) 
 
     return x_common.tolist(), y_fit.tolist(), print_exp(params)
@@ -364,3 +370,28 @@ def predict_function_type(points, model): # returns function type
     elif predicted_class == 3:
         return "sine"
     
+   
+def predict_degree(x,y,model_degree):
+
+    x,y = sort_array(x,y)
+    points = list(zip(x,y))
+    predicted_degree = predict_degree_type(points, model_degree)
+    return predicted_degree
+
+
+def predict_degree_type(points, model):
+    
+    points_reshaped = np.array([points])
+    prediction = model.predict(points_reshaped)
+    predicted_degree = np.argmax(prediction)
+
+    if predicted_degree == 0:
+        return 1
+    elif predicted_degree == 1:
+        return 2
+    elif predicted_degree == 2:
+        return 3
+    elif predicted_degree == 3:
+        return 4
+    elif predicted_degree == 4:
+        return 5
