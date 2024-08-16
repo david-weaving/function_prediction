@@ -94,6 +94,27 @@
         .zoom-button:hover {
             background-color: #0056b3;
         }
+        /* New styles for loading indicator */
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -108,6 +129,12 @@
 
     <button onclick="processData()">Get Prediction</button>
     <button onclick="clearInputs()">Clear Inputs</button>
+
+    <!-- New loading indicator -->
+    <div id="loading">
+        <div class="spinner"></div>
+        Processing... Please wait.
+    </div>
 
     <div class="links">
         <a href="/info">How It Works</a>
@@ -204,11 +231,19 @@
     
         async function processData() {
             try {
+                const loadingDiv = document.getElementById('loading');
+                const resultsDiv = document.getElementById('results');
+
+                // Show loading message
+                loadingDiv.style.display = 'block';
+                resultsDiv.innerHTML = '';
+
                 const x_input = document.getElementById('x_input').value.split(',').map(Number);
                 const y_input = document.getElementById('y_input').value.split(',').map(Number);
 
                 if (x_input.length !== 6 || y_input.length !== 6) {
-                    document.getElementById('results').innerText = 'Error: Please input exactly six x and y values, separated by commas.';
+                    resultsDiv.innerText = 'Error: Please input exactly six x and y values, separated by commas.';
+                    loadingDiv.style.display = 'none';
                     return;
                 }
 
@@ -223,13 +258,15 @@
                 const data = await response.json();
                 console.log("Server response:", data); // Debug log
 
+                // Hide loading message
+                loadingDiv.style.display = 'none';
+
                 if (data.error) {
-                    document.getElementById('results').innerText = `Error: ${data.error}`;
+                    resultsDiv.innerText = `Error: ${data.error}`;
                     return;
                 }
 
                 const { x_common, y_fit, predicted_function, function: e_function } = data.result;
-                const resultsDiv = document.getElementById('results');
 
                 // Use predicted_function directly
                 let displayFunctionType = predicted_function;
@@ -316,6 +353,7 @@
 
             } catch (error) {
                 console.error("Error in processData:", error);
+                document.getElementById('loading').style.display = 'none';
                 document.getElementById('results').innerText = `Error: ${error}`;
             }
         }
