@@ -108,53 +108,38 @@ def poly_average(x,y,degree):
     return x_common.tolist(), y_values.tolist(), print_poly(coeffs)
 
 def exp_average(x, y):
-    # define the exp model fitting function
     def exp_model(x, A, b, C):
         return A * np.exp(b * x) + C
 
-    # initial guess for parameters
     def initial_guess(x_points, y_points):
         A_guess = (np.max(y_points) - np.min(y_points)) / (np.exp(np.max(x_points)) - np.exp(np.min(x_points)))
-        
-        try:
-            b_guess = np.log(y_points[-1] / y_points[0]) / (x_points[-1] - x_points[0])
-            if np.isnan(b_guess):
-                b_guess = 0.1  # if a negative falls into the log we default guess
-        except (ValueError, IndexError):
-            b_guess = 0.1  # if there is some value error in the log we default guess
-            
-        
-        C_guess = np.min(y_points)  # C is guessed based on the smallest y value
-        
+        b_guess = np.log(y_points[-1] / y_points[0]) / (x_points[-1] - x_points[0]) if y_points[0] != 0 else 0.1
+        C_guess = np.min(y_points)
         return [A_guess, b_guess, C_guess]
 
     def print_exp(params):
-        if params[2] > 0 or params[2] == 0:
-            e_func = f"{params[0]}e^{params[1]}x + {params[2]}"
-            return e_func
-        else:
-            e_func = f"{params[0]}e^{params[1]}x - {abs(params[2])}"
-            return e_func
+        return f"{params[0]}e^({params[1]}x) + {params[2]}"
 
-    # fit the model to the data
     try:
-        params, _ = curve_fit(exp_model, x, y, p0=initial_guess(x, y), maxfev=10000) # returns the coeffs
-    except RuntimeError as e:
-        print(f"Error fitting data: {e}")
-        return
-
+        params, _ = curve_fit(exp_model, x, y, p0=initial_guess(x, y), maxfev=10000)
+    except RuntimeError:
+        # If curve_fit fails, use a simple exponential model
+        A = np.max(y) - np.min(y)
+        b = 0.1
+        C = np.min(y)
+        params = [A, b, C]
 
     A_fit, b_fit, C_fit = params
-    
-    # create our function
-    x_common = np.linspace(np.min(x), np.max(x), 400)
 
+    x_common = np.linspace(np.min(x), np.max(x), 400)
     x_forward = np.linspace(np.max(x)+0.1, 150, 400)
     x_backward = np.linspace(-150, np.min(x)-0.1, 400)
-    x_common = np.append(x_common, x_forward)
-    x_common = np.insert(x_common, 0, x_backward)
+    x_common = np.concatenate([x_backward, x_common, x_forward])
 
-    y_fit = exp_model(x_common, A_fit, b_fit, C_fit) 
+    y_fit = exp_model(x_common, A_fit, b_fit, C_fit)
+
+    # Replace inf values with the largest finite number
+    y_fit[np.isinf(y_fit)] = np.finfo(float).max
 
     return x_common.tolist(), y_fit.tolist(), print_exp(params)
 
@@ -338,7 +323,7 @@ def ln_average(x,y):
     x_common = np.linspace(x_min, x_max, 400)
 
     # continue the graph
-    x_forward = np.linspace(x_max+0.1, 50, 400)
+    x_forward = np.linspace(x_max+0.1, 150, 400)
     x_backward = np.linspace((0.1-C)/B, x_min-0.1, 400) # C * -1 is the end bound (where we dont go below zero in our square root)
     x_common = np.append(x_common, x_forward)
     x_common = np.insert(x_common, 0, x_backward)
