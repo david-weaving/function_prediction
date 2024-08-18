@@ -6,24 +6,66 @@
     <title>About the Function Predictor</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
+            background-color: #f9f9f9;
             color: #333;
+            line-height: 1.6;
         }
         .container {
-            width: 80%;
-            margin: auto;
-            overflow: hidden;
+            max-width: 900px;
+            margin: 2em auto;
             padding: 2em;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
         h1 {
             text-align: center;
-            margin-bottom: 1em;
+            color: #007bff;
+            margin-bottom: 1.5em;
+            font-size: 2.5em;
+        }
+        h2 {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 1.2em;
+            font-size: 2em;
         }
         p {
-            line-height: 1.6;
+            margin-bottom: 1.2em;
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #555;
+        }
+        img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 1.5em auto;
+            border-radius: 8px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .links {
+            text-align: center;
+            margin-top: 2em;
+        }
+        .note {
+            font-style: italic;
+            color: #666;
+            margin-top: 2em;
+            border-left: 4px solid #007bff;
+            padding-left: 1em;
+            background-color: #f1f1f1;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -31,18 +73,37 @@
     <div class="container">
         <h1>About the Function Predictor</h1>
         <p>
-            This app is a function predictor. It takes in 6 (x,y) points. The points are passed through an AI model that determines the function type: polynomial, exponential, sine, or natural log. Then,
-            the points are fitted to the function type predicted through mathematical algorithms. Once fitted, we can generate the rest of the points as well as returning the function itself.
+            This app is a function predictor that takes in 6 (x,y) points. These points are passed through an AI model that determines the function type: polynomial, exponential, sine, or natural log. Then, the points are fitted to the predicted function type through mathematical algorithms. If the function is determined to be polynomial, another AI model will further predict the degree (ranging from 1 to 5). Once fitted, the remaining points are generated, and the function itself is returned.
+        </p>
+
+        <h2>How to Use It</h2>
+
+        <p>
+            Using the function predictor is very simple. First, you need 6 (x,y) points. The function predictor only works with exactly 6 points. You can pull these from a data set, an existing function, or even make them up yourself! Ensure that your points are separated by commas.
+        </p>
+
+        <p>
+            Example points:
+        </p>
+        <img src="/how_works.JPG" alt="Example points for function predictor" />
+
+        <p>
+            In the example image above, the points would plot as (1,7), (2,8), (3,9), (4,10), (5,11), and (6,12). The function generator will then fit a graph and function to your points. It's that easy!
         </p>
         <p>
-            Please note that this application is in early access and the AI model may get some points wrong. I am always looking to improve the model as well as the website for the best user experience.
+            If you'd like to fit the points to a specific function and plot however many points you'd like, you can click here: <a href="/user_predict">Predict Myself</a>.
         </p>
+
+        <div class="note">
+            <h3>Developer Note:</h3>
+            <p>
+                Please note that this application is in early access, and the AI model may get some points wrong. I am continually working to improve the model and the website to enhance the user experience.
+            </p>
+        </div>
+
         <div class="links">
             <a href="/index">Back To Prediction</a>
         </div>
     </div>
-
-
-
 </body>
 </html>
