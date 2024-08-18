@@ -14,6 +14,7 @@ app = Flask(__name__)
 model = tf.keras.models.load_model("C:/Users/Administrator/func pred/function_prediction/models/model_V1_8.h5")
 model_degree =tf.keras.models.load_model("C:/Users/Administrator/func pred/function_prediction/models/model_degree_V1.h5")
 
+
 @app.route('/')
 def serve_html():
     return send_from_directory('.', 'index.html')
@@ -30,6 +31,9 @@ def index():
 def serve_user():
     return send_from_directory('.', 'user_predict.html')
 
+@app.route('/how_works.JPG')
+def serve_image():
+    return send_from_directory('.', 'how_works.JPG')
 
 @app.route('/predict_poly', methods=['POST'])
 def poly_p():
