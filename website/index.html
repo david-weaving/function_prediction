@@ -6,110 +6,136 @@
     <title>Function Prediction</title>
     <link rel="stylesheet" type="text/css" href="https://jsxgraph.org/distrib/jsxgraph.css" />
     <script type="text/javascript" src="https://jsxgraph.org/distrib/jsxgraphcore.js"></script>
-    
+
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            padding-bottom: 40px;
+            padding: 0;
             background-color: #f4f4f9;
             color: #333;
+            font-size: 16px;
         }
         h1 {
-            text-align: center;  /* This centers the h1 element */
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 27px;
+            color: #007bff;
         }
         h2 {
             margin-top: 0;
+            font-size: 29px;
+            color: #007bff;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 27px;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
         label {
             display: block;
-            margin: 10px 0 5px;
+            margin: 13px 0 7px;
+            font-size: 18px;
+            color: #555;
         }
         input {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 13px;
+            margin-bottom: 13px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
             box-sizing: border-box;
+            font-size: 16px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: flex-start;
+            gap: 13px;
+            margin-top: 13px;
         }
         button {
-            padding: 10px 15px;
-            margin: 5px 5px 5px 0;
+            padding: 13px 22px;
             border: none;
             background-color: #28a745;
             color: white;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
         }
         button:hover {
             background-color: #218838;
         }
         .links {
-            margin: 20px 0;
+            margin-top: 27px;
+            text-align: left;
         }
         .links a {
             color: #007bff;
             text-decoration: none;
-            margin-right: 20px;
+            margin-right: 27px;
+            font-size: 16px;
         }
         .links a:hover {
             text-decoration: underline;
         }
         #results {
-            margin-top: 20px;
+            margin-top: 27px;
+            font-size: 16px;
         }
         .chart-container {
             display: none;
-            margin-top: 20px;
+            margin-top: 27px;
             width: 100%;
         }
         .jxgbox {
             width: 100% !important;
-            height: 1200px !important;
+            height: 800px !important; /* Reduced height */
             margin: 0 auto;
         }
         #fittedPointsContainer {
-            margin-bottom: 40px;
+            margin-bottom: 45px;
         }
         .chart-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 13px;
         }
         .zoom-buttons {
             display: flex;
-            gap: 10px;
+            gap: 13px;
         }
         .zoom-button {
-            padding: 5px 10px;
+            padding: 7px 13px;
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 14px;
         }
         .zoom-button:hover {
             background-color: #0056b3;
         }
-        /* New styles for loading indicator */
         #loading {
             display: none;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 27px;
             font-weight: bold;
             color: #007bff;
+            font-size: 18px;
         }
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #007bff;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #007bff;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 54px;
+            height: 54px;
             animation: spin 1s linear infinite;
-            margin: 10px auto;
+            margin: 13px auto;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -118,49 +144,53 @@
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Function Prediction</h1>
 
-    <h1>Function Prediction</h1>
+        <div class="input-container">
+            <label for="x_input">X values (6 numbers comma separated):</label>
+            <input type="text" id="x_input" placeholder="e.g. 1,2,3,4,5,6">
 
-    <label for="x_input">X values (comma separated):</label>
-    <input type="text" id="x_input" placeholder="e.g. 1,2,3,4,5,6">
+            <label for="y_input">Y values (6 numbers comma separated):</label>
+            <input type="text" id="y_input" placeholder="e.g. 1,2,3,4,5,6">
 
-    <label for="y_input">Y values (comma separated):</label>
-    <input type="text" id="y_input" placeholder="e.g. 1,2,3,4,5,6">
+            <div class="button-container">
+                <button onclick="processData()">Get Prediction</button>
+                <button onclick="clearInputs()">Clear Inputs</button>
+            </div>
 
-    <button onclick="processData()">Get Prediction</button>
-    <button onclick="clearInputs()">Clear Inputs</button>
-
-    <!-- New loading indicator -->
-    <div id="loading">
-        <div class="spinner"></div>
-        Processing... Please wait.
-    </div>
-
-    <div class="links">
-        <a href="/info">How It Works</a>
-        <a href="/user_predict">Predict Myself</a>
-    </div>
-    
-    <div id="results"></div>
-    <div id="fittedPointsContainer" class="chart-container">
-        <div class="chart-header">
-            <h2>Predicted Function with Fitted Points</h2>
-            <div class="zoom-buttons">
-                <button class="zoom-button" onclick="zoomIn('board')">Zoom In</button>
-                <button class="zoom-button" onclick="zoomOut('board')">Zoom Out</button>
+            <div class="links">
+                <a href="/info">How It Works</a>
+                <a href="/user_predict">Predict Myself</a>
             </div>
         </div>
-        <div id="jxgbox" class="jxgbox"></div>
-    </div>
-    <div id="fullFunctionContainer" class="chart-container">
-        <div class="chart-header">
-            <h2>Full Predicted Function</h2>
-            <div class="zoom-buttons">
-                <button class="zoom-button" onclick="zoomIn('fullBoard')">Zoom In</button>
-                <button class="zoom-button" onclick="zoomOut('fullBoard')">Zoom Out</button>
-            </div>
+
+        <div id="loading">
+            <div class="spinner"></div>
+            Generating Function... Please wait.
         </div>
-        <div id="fullJxgbox" class="jxgbox"></div>
+
+        <div id="results"></div>
+        <div id="fittedPointsContainer" class="chart-container">
+            <div class="chart-header">
+                <h2>Predicted Function with Fitted Points</h2>
+                <div class="zoom-buttons">
+                    <button class="zoom-button" onclick="zoomIn('board')">Zoom In</button>
+                    <button class="zoom-button" onclick="zoomOut('board')">Zoom Out</button>
+                </div>
+            </div>
+            <div id="jxgbox" class="jxgbox"></div>
+        </div>
+        <div id="fullFunctionContainer" class="chart-container">
+            <div class="chart-header">
+                <h2>Full Predicted Function</h2>
+                <div class="zoom-buttons">
+                    <button class="zoom-button" onclick="zoomIn('fullBoard')">Zoom In</button>
+                    <button class="zoom-button" onclick="zoomOut('fullBoard')">Zoom Out</button>
+                </div>
+            </div>
+            <div id="fullJxgbox" class="jxgbox"></div>
+        </div>
     </div>
 
     <script>
@@ -181,7 +211,7 @@
         function ln(a, b, x) {
             return a * Math.log(x) + b;
         }
-    
+
         function clearInputs() {
             document.getElementById('x_input').value = '';
             document.getElementById('y_input').value = '';
@@ -190,25 +220,25 @@
             document.getElementById('fullFunctionContainer').style.display = 'none';
             if (board) {
                 JXG.JSXGraph.freeBoard(board);
+                board = null; // Reset board variable
             }
             if (fullBoard) {
                 JXG.JSXGraph.freeBoard(fullBoard);
+                fullBoard = null; // Reset fullBoard variable
             }
         }
-    
+
         function formatFunction(e_function) {
             return e_function.replace(/x\^(\d+)/g, (match, p1) => `x<sup>${p1}</sup>`);
         }
-    
+
         function createPredictedFunction(e_function, function_type) {
             console.log("Creating function for:", e_function, "Type:", function_type);
             try {
-                // Remove any leading/trailing whitespace and ensure the function is valid
                 const cleanedFunction = e_function.trim().replace(/\s+/g, ' ');
                 return new Function('x', `return ${cleanedFunction}`);
             } catch (error) {
                 console.error("Error creating function:", error);
-                // Return a default function that always returns 0
                 return () => 0;
             }
         }
@@ -228,13 +258,12 @@
                 fullBoard.zoomOut();
             }
         }
-    
+
         async function processData() {
             try {
                 const loadingDiv = document.getElementById('loading');
                 const resultsDiv = document.getElementById('results');
 
-                // Show loading message
                 loadingDiv.style.display = 'block';
                 resultsDiv.innerHTML = '';
 
@@ -256,9 +285,8 @@
                 });
 
                 const data = await response.json();
-                console.log("Server response:", data); // Debug log
+                console.log("Server response:", data);
 
-                // Hide loading message
                 loadingDiv.style.display = 'none';
 
                 if (data.error) {
@@ -268,10 +296,8 @@
 
                 const { x_common, y_fit, predicted_function, function: e_function } = data.result;
 
-                // Use predicted_function directly
                 let displayFunctionType = predicted_function;
 
-                // Convert 'ln' to 'Natural Log' for display if necessary
                 if (displayFunctionType.toLowerCase() === 'ln') {
                     displayFunctionType = 'Natural Log';
                 }
@@ -286,10 +312,8 @@
                 document.getElementById('fittedPointsContainer').style.display = 'block';
                 document.getElementById('fullFunctionContainer').style.display = 'block';
 
-                // Create a function from the e_function string
                 const predictedFunc = createPredictedFunction(e_function, displayFunctionType);
 
-                // Plot fitted points
                 if (board) {
                     JXG.JSXGraph.freeBoard(board);
                 }
@@ -309,21 +333,17 @@
                     }
                 });
 
-                // Plot user points
                 x_input.forEach((x, i) => {
                     board.create('point', [x, y_input[i]], {name: '', fixed: true, fillColor: 'red', strokeColor: 'red'});
                 });
 
-                // Plot fitted curve
                 board.create('functiongraph', [predictedFunc], {strokeColor: 'blue'});
 
-                // Plot all fitted points
                 const fittedPoints = board.create('curve', [x_common, y_fit], {
                     strokeColor: 'blue',
                     strokeWidth: 2,
                 });
 
-                // Plot full function
                 if (fullBoard) {
                     JXG.JSXGraph.freeBoard(fullBoard);
                 }
@@ -345,7 +365,6 @@
 
                 fullBoard.create('functiongraph', [predictedFunc], {strokeColor: 'blue'});
 
-                // Plot all fitted points on full function graph
                 const fullFittedPoints = fullBoard.create('curve', [x_common, y_fit], {
                     strokeColor: 'blue',
                     strokeWidth: 2,

@@ -10,78 +10,111 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background-color: #f4f4f9;
             color: #333;
+            font-size: 16px;
         }
         h1 {
             text-align: center;
+            font-size: 36px;
+            margin-bottom: 27px;
+            color: #007bff;
+        }
+        h2 {
+            margin-top: 0;
+            font-size: 29px;
+            color: #007bff;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 27px;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
         label {
             display: block;
-            margin: 10px 0 5px;
+            margin: 13px 0 7px;
+            font-size: 18px;
+            color: #555;
         }
         input, select {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            width: 100%;
+            padding: 13px;
+            margin-bottom: 13px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 13px;
+            margin-top: 13px;
         }
         button {
-            padding: 10px 15px;
-            margin: 5px;
+            padding: 13px 22px;
             border: none;
             background-color: #28a745;
             color: white;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
         }
         button:hover {
             background-color: #218838;
         }
-        a {
-            display: block;
-            margin: 20px 0;
+        .links {
+            margin-top: 27px;
+            text-align: left;
+        }
+        .links a {
             color: #007bff;
             text-decoration: none;
+            margin-right: 27px;
+            font-size: 16px;
         }
-        a:hover {
+        .links a:hover {
             text-decoration: underline;
         }
         #results {
-            margin-top: 20px;
+            margin-top: 27px;
+            font-size: 16px;
         }
         .chart-container {
             display: none;
-            margin-top: 20px;
+            margin-top: 27px;
             width: 100%;
         }
         .jxgbox {
             width: 100% !important;
-            height: 1200px !important;
+            height: 800px !important; /* Reduced height */
             margin: 0 auto;
         }
         #fittedPointsContainer {
-            margin-bottom: 40px;
+            margin-bottom: 45px;
         }
         .chart-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 13px;
         }
         .zoom-buttons {
             display: flex;
-            gap: 10px;
+            gap: 13px;
         }
         .zoom-button {
-            padding: 5px 10px;
+            padding: 7px 13px;
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 14px;
         }
         .zoom-button:hover {
             background-color: #0056b3;
@@ -89,53 +122,59 @@
     </style>
 </head>
 <body>
-    <h1>User Function Prediction</h1>
+    <div class="container">
+        <h1>User Function Prediction</h1>
 
-    <p>Here you can decide how you want to fit your points. Keep in mind that some points will not fit to some function types. You are also not restricted to six points.</p>
+        <p>Here you can decide how you want to fit your points. Keep in mind that some points will not fit to some function types. You are also not restricted to six points.</p>
 
-    <label for="x_input">X values (comma separated):</label>
-    <input type="text" id="x_input" placeholder="e.g. x1, x2, x3, x4, x5, x6">
+        <label for="x_input">X values (comma separated):</label>
+        <input type="text" id="x_input" placeholder="e.g. x1, x2, x3, x4, x5, x6">
 
-    <label for="y_input">Y values (comma separated):</label>
-    <input type="text" id="y_input" placeholder="e.g. y1, y2, y3, y4, y5, y6">
+        <label for="y_input">Y values (comma separated):</label>
+        <input type="text" id="y_input" placeholder="e.g. y1, y2, y3, y4, y5, y6">
 
-    <label for="degree_input">Polynomial Degree:</label>
-    <select id="degree_input">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-    </select>
+        <label for="degree_input">Polynomial Degree:</label>
+        <select id="degree_input">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
 
-    <button onclick="predictPolynomial()">Predict Polynomial</button>
-    <button onclick="predictSine()">Predict Sine</button>
-    <button onclick="predictLn()">Predict Natural Log</button>
-    <button onclick="predictExponential()">Predict Exponential</button>
-    <button onclick="clearInputs()">Clear Inputs</button>
-    <div class="links">
-        <a href="/index">Back To Prediction</a>
-    </div>
-    <div id="results"></div>
-    <div id="fittedPointsContainer" class="chart-container">
-        <div class="chart-header">
-            <h2>Predicted Function with Fitted Points</h2>
-            <div class="zoom-buttons">
-                <button class="zoom-button" onclick="zoomIn('board')">Zoom In</button>
-                <button class="zoom-button" onclick="zoomOut('board')">Zoom Out</button>
-            </div>
+        <div class="button-container">
+            <button onclick="predictPolynomial()">Predict Polynomial</button>
+            <button onclick="predictSine()">Predict Sine</button>
+            <button onclick="predictLn()">Predict Natural Log</button>
+            <button onclick="predictExponential()">Predict Exponential</button>
+            <button onclick="clearInputs()">Clear Inputs</button>
         </div>
-        <div id="jxgbox" class="jxgbox"></div>
-    </div>
-    <div id="fullFunctionContainer" class="chart-container">
-        <div class="chart-header">
-            <h2>Full Predicted Function</h2>
-            <div class="zoom-buttons">
-                <button class="zoom-button" onclick="zoomIn('fullBoard')">Zoom In</button>
-                <button class="zoom-button" onclick="zoomOut('fullBoard')">Zoom Out</button>
-            </div>
+
+        <div class="links">
+            <a href="/index">Back To Prediction</a>
         </div>
-        <div id="fullJxgbox" class="jxgbox"></div>
+
+        <div id="results"></div>
+        <div id="fittedPointsContainer" class="chart-container">
+            <div class="chart-header">
+                <h2>Predicted Function with Fitted Points</h2>
+                <div class="zoom-buttons">
+                    <button class="zoom-button" onclick="zoomIn('board')">Zoom In</button>
+                    <button class="zoom-button" onclick="zoomOut('board')">Zoom Out</button>
+                </div>
+            </div>
+            <div id="jxgbox" class="jxgbox"></div>
+        </div>
+        <div id="fullFunctionContainer" class="chart-container">
+            <div class="chart-header">
+                <h2>Full Predicted Function</h2>
+                <div class="zoom-buttons">
+                    <button class="zoom-button" onclick="zoomIn('fullBoard')">Zoom In</button>
+                    <button class="zoom-button" onclick="zoomOut('fullBoard')">Zoom Out</button>
+                </div>
+            </div>
+            <div id="fullJxgbox" class="jxgbox"></div>
+        </div>
     </div>
 
     <script>
@@ -162,11 +201,22 @@
             document.getElementById('results').innerHTML = '';
             document.getElementById('fittedPointsContainer').style.display = 'none';
             document.getElementById('fullFunctionContainer').style.display = 'none';
+            
             if (board) {
-                JXG.JSXGraph.freeBoard(board);
+                try {
+                    JXG.JSXGraph.freeBoard(board);
+                } catch (error) {
+                    console.warn("Error clearing board:", error);
+                }
+                board = null;
             }
             if (fullBoard) {
-                JXG.JSXGraph.freeBoard(fullBoard);
+                try {
+                    JXG.JSXGraph.freeBoard(fullBoard);
+                } catch (error) {
+                    console.warn("Error clearing fullBoard:", error);
+                }
+                fullBoard = null;
             }
         }
 
@@ -208,132 +258,132 @@
         }
 
         async function processData(endpoint, additionalData = {}) {
-    try {
-        const x_input = document.getElementById('x_input').value.trim();
-        const y_input = document.getElementById('y_input').value.trim();
+            try {
+                const x_input = document.getElementById('x_input').value.trim();
+                const y_input = document.getElementById('y_input').value.trim();
 
-        // Check if inputs are empty
-        if (x_input === '' || y_input === '') {
-            document.getElementById('results').innerText = 'Error: Please enter both x and y values.';
-            return;
-        }
+                // Check if inputs are empty
+                if (x_input === '' || y_input === '') {
+                    document.getElementById('results').innerText = 'Error: Please enter both x and y values.';
+                    return;
+                }
 
-        const x_values = x_input.split(',').map(Number);
-        const y_values = y_input.split(',').map(Number);
+                const x_values = x_input.split(',').map(Number);
+                const y_values = y_input.split(',').map(Number);
 
-        // Check if number of x and y values are equal
-        if (x_values.length !== y_values.length) {
-            document.getElementById('results').innerText = 'Error: The number of x values must match the number of y values.';
-            return;
-        }
+                // Check if number of x and y values are equal
+                if (x_values.length !== y_values.length) {
+                    document.getElementById('results').innerText = 'Error: The number of x values must match the number of y values.';
+                    return;
+                }
 
-        // Check if there are any NaN values
-        if (x_values.some(isNaN) || y_values.some(isNaN)) {
-            document.getElementById('results').innerText = 'Error: Please enter valid numbers for all x and y values.';
-            return;
-        }
+                // Check if there are any NaN values
+                if (x_values.some(isNaN) || y_values.some(isNaN)) {
+                    document.getElementById('results').innerText = 'Error: Please enter valid numbers for all x and y values.';
+                    return;
+                }
 
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ x: x_values, y: y_values, ...additionalData })
-        });
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ x: x_values, y: y_values, ...additionalData })
+                });
 
-        const data = await response.json();
+                const data = await response.json();
 
-        if (data.error) {
-            document.getElementById('results').innerText = `Error: ${data.error}`;
-            return;
-        }
+                if (data.error) {
+                    document.getElementById('results').innerText = `Error: ${data.error}`;
+                    return;
+                }
 
-        const { x_common, y_fit, function: e_function } = data.result;
-        const resultsDiv = document.getElementById('results');
+                const { x_common, y_fit, function: e_function } = data.result;
+                const resultsDiv = document.getElementById('results');
 
-        const formattedFunction = formatFunction(e_function);
-        resultsDiv.innerHTML = `<h2>Function: ${formattedFunction}</h2><br>`;
+                const formattedFunction = formatFunction(e_function);
+                resultsDiv.innerHTML = `<h2>Function: ${formattedFunction}</h2><br>`;
 
-        document.getElementById('fittedPointsContainer').style.display = 'block';
-        document.getElementById('fullFunctionContainer').style.display = 'block';
+                document.getElementById('fittedPointsContainer').style.display = 'block';
+                document.getElementById('fullFunctionContainer').style.display = 'block';
 
-        const predictedFunc = createPredictedFunction(e_function);
+                const predictedFunc = createPredictedFunction(e_function);
 
-        // Add a check to ensure the function is valid
-        if (typeof predictedFunc !== 'function') {
-            throw new Error('Failed to create a valid function');
-        }
+                // Add a check to ensure the function is valid
+                if (typeof predictedFunc !== 'function') {
+                    throw new Error('Failed to create a valid function');
+                }
 
-        // Plot fitted points
-        if (board) {
-            JXG.JSXGraph.freeBoard(board);
-        }
-        board = JXG.JSXGraph.initBoard('jxgbox', {
-            boundingbox: [Math.min(...x_values) - 1, Math.max(...y_values) + 1, Math.max(...x_values) + 1, Math.min(...y_values) - 1],
-            axis: true,
-            keepaspectratio: false,
-            showNavigation: false,
-            zoom: {
-                wheel: false,
-                needshift: false,
-                eps: 0.1
-            },
-            pan: {
-                enabled: true,
-                needshift: false
+                // Plot fitted points
+                if (board) {
+                    JXG.JSXGraph.freeBoard(board);
+                }
+                board = JXG.JSXGraph.initBoard('jxgbox', {
+                    boundingbox: [Math.min(...x_values) - 1, Math.max(...y_values) + 1, Math.max(...x_values) + 1, Math.min(...y_values) - 1],
+                    axis: true,
+                    keepaspectratio: false,
+                    showNavigation: false,
+                    zoom: {
+                        wheel: false,
+                        needshift: false,
+                        eps: 0.1
+                    },
+                    pan: {
+                        enabled: true,
+                        needshift: false
+                    }
+                });
+
+                // Plot user points
+                x_values.forEach((x, i) => {
+                    board.create('point', [x, y_values[i]], {name: '', fixed: true, fillColor: 'red', strokeColor: 'red'});
+                });
+
+                // Plot fitted curve
+                board.create('functiongraph', [predictedFunc], {strokeColor: 'blue'});
+
+                // Plot all fitted points
+                board.create('curve', [x_common, y_fit], {
+                    strokeColor: 'blue',
+                    strokeWidth: 2,
+                });
+
+                // Plot full function
+                if (fullBoard) {
+                    JXG.JSXGraph.freeBoard(fullBoard);
+                }
+                fullBoard = JXG.JSXGraph.initBoard('fullJxgbox', {
+                    boundingbox: [-100, 100, 100, -100],
+                    axis: true,
+                    showNavigation: false,
+                    zoom: {
+                        wheel: false,
+                        needshift: false,
+                        eps: 0.1
+                    },
+                    pan: {
+                        enabled: true,
+                        needshift: false
+                    },
+                    keepaspectratio: false
+                });
+
+                fullBoard.create('functiongraph', [predictedFunc], {strokeColor: 'blue'});
+
+                // Plot all fitted points on full function graph
+                fullBoard.create('curve', [x_common, y_fit], {
+                    strokeColor: 'blue',
+                    strokeWidth: 2,
+                });
+
+            } catch (error) {
+                console.error("Error in processData:", error);
+                document.getElementById('results').innerText = `Error: ${error.message}`;
+                // Clear the charts if there's an error
+                document.getElementById('fittedPointsContainer').style.display = 'none';
+                document.getElementById('fullFunctionContainer').style.display = 'none';
             }
-        });
-
-        // Plot user points
-        x_values.forEach((x, i) => {
-            board.create('point', [x, y_values[i]], {name: '', fixed: true, fillColor: 'red', strokeColor: 'red'});
-        });
-
-        // Plot fitted curve
-        board.create('functiongraph', [predictedFunc], {strokeColor: 'blue'});
-
-        // Plot all fitted points
-        board.create('curve', [x_common, y_fit], {
-            strokeColor: 'blue',
-            strokeWidth: 2,
-        });
-
-        // Plot full function
-        if (fullBoard) {
-            JXG.JSXGraph.freeBoard(fullBoard);
         }
-        fullBoard = JXG.JSXGraph.initBoard('fullJxgbox', {
-            boundingbox: [-100, 100, 100, -100],
-            axis: true,
-            showNavigation: false,
-            zoom: {
-                wheel: false,
-                needshift: false,
-                eps: 0.1
-            },
-            pan: {
-                enabled: true,
-                needshift: false
-            },
-            keepaspectratio: false
-        });
-
-        fullBoard.create('functiongraph', [predictedFunc], {strokeColor: 'blue'});
-
-        // Plot all fitted points on full function graph
-        fullBoard.create('curve', [x_common, y_fit], {
-            strokeColor: 'blue',
-            strokeWidth: 2,
-        });
-
-    } catch (error) {
-        console.error("Error in processData:", error);
-        document.getElementById('results').innerText = `Error: ${error.message}`;
-        // Clear the charts if there's an error
-        document.getElementById('fittedPointsContainer').style.display = 'none';
-        document.getElementById('fullFunctionContainer').style.display = 'none';
-    }
-}
     </script>
 </body>
 </html>
