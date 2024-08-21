@@ -67,6 +67,7 @@ def poly_average(x,y,degree):
         p = np.size(coeffs) - 1
         e_func = ""
         for i in coeffs:
+            i = np.round(i, decimals=2)
             if p == np.size(coeffs) - 1:
                 e_func += f"{i}x^{p}"
             elif i > 0 and p > 0 and p != 1:
@@ -93,8 +94,8 @@ def poly_average(x,y,degree):
     x_common = np.linspace(x_min, x_max, 400)
 
     # continue the graph
-    x_forward = np.linspace(x_max+0.1, 150, 400)
-    x_backward = np.linspace(-150, x_min-0.1, 400)
+    x_forward = np.linspace(x_max+0.1, 150+np.max(x), 400)
+    x_backward = np.linspace(-150-abs(np.min(x)), x_min-0.1, 400)
     x_common = np.append(x_common, x_forward)
     x_common = np.insert(x_common, 0, x_backward)
 
@@ -118,7 +119,18 @@ def exp_average(x, y):
         return [A_guess, b_guess, C_guess]
 
     def print_exp(params):
-        return f"{params[0]}e^({params[1]}x) + {params[2]}"
+        if params[0] < 0.01:
+            np.round(params, decimals=7)
+            if params[2] > 0:
+                return f"{params[0]}e^({np.round(params[1],decimals=2)}x) + {np.round(params[2],decimals=2)}"
+            else:
+                return f"{params[0]}e^({np.round(params[1],decimals=2)}x) - {np.round(params[2],decimals=2)}"
+        else:
+            params = np.round(params, decimals=2)
+            if params[2] > 0:
+                return f"{params[0]}e^({params[1]}x) + {params[2]}"
+            else:
+                return f"{params[0]}e^({params[1]}x) - {abs(params[2])}"
 
     try:
         params, _ = curve_fit(exp_model, x, y, p0=initial_guess(x, y), maxfev=10000)
@@ -166,6 +178,11 @@ def sine_average(x, y):
 
     # for printing the function
     def print_sine(A,B,C,D):
+        A = np.round(A, decimals=2)
+        B = np.round(B, decimals=2)
+        C = np.round(C, decimals=2)
+        D = np.round(D, decimals=2)
+
         if D > 0 and C > 0:
             e_func = f"{A}sin({B}x + {D}) + {C}"
         elif D < 0 and C > 0:
@@ -185,8 +202,8 @@ def sine_average(x, y):
     x_common = np.linspace(x_min, x_max, 400)
 
     # continue the graph
-    x_forward = np.linspace(x_max+0.1, 50, 400)
-    x_backward = np.linspace(-50, x_min-0.1, 400)
+    x_forward = np.linspace(x_max+0.1, 50+np.max(x), 400)
+    x_backward = np.linspace(-50-abs(np.min(x)), x_min-0.1, 400)
     x_common = np.append(x_common, x_forward)
     x_common = np.insert(x_common, 0, x_backward)
 
