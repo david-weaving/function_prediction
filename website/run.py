@@ -31,6 +31,10 @@ def index():
 def serve_user():
     return send_from_directory('.', 'user_predict.html')
 
+@app.route('/choose')
+def serve_choose():
+    return send_from_directory('.', 'choose.html')
+
 @app.route('/how_works.JPG')
 def serve_image():
     return send_from_directory('.', 'how_works.JPG')
