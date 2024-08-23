@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Function Prediction</title>
+    <link rel="stylesheet" type="text/css" href="https://jsxgraph.org/distrib/jsxgraph.css" />
+    <script type="text/javascript" src="https://jsxgraph.org/distrib/jsxgraphcore.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            font-size: 16px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 27px;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 27px;
+            color: #007bff;
+        }
+        #jxgbox {
+            width: 100%;
+            height: 600px;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        #controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            padding: 13px 22px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .function-result {
+            color: #007bff;
+            font-weight: bold;
+        }
+        .note {
+            font-style: italic;
+            color: #666;
+            margin-top: 2em;
+            border-left: 4px solid #007bff;
+            padding-left: 1em;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+        }
+        .links {
+            margin-top: 27px;
+            text-align: center;
+        }
+        .links a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 27px;
+            font-size: 16px;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Interactive Function Prediction</h1>
+        <div id="jxgbox"></div>
+        <div id="controls">
+            <button id="predictBtn" disabled>Get Prediction</button>
+            <button id="clearBtn">Clear Inputs</button>
+        </div>
+        <div id="result"></div>
+        <div class="note">
+            <h3>How to use:</h3>
+            <p>1. Click on the graph to add a point (must choose 6).</p>
+            <p>2. Once the 6 points are chosen click "Get Prediction".</p>
+            <p>3. Your points are fitted! You can click "Clear Inputs" to try more points.</p>
+        </div>
+        <div class="links">
+            <a href="/index">Back To Main Prediction</a>
+        </div>
+    </div>
+
+    <script>
+        let board, points;
+
+        function initializeBoard() {
+            // Initialize the board
+            board = JXG.JSXGraph.initBoard('jxgbox', {
+                boundingbox: [-10, 10, 10, -10],
+                axis: true,
+                showCopyright: false
+            });
+
+            // Initialize the points array
+            points = [];
+
+            // Add event listener for adding points
+            board.on('down', function(e) {
+                if (points.length < 6) {
+                    let coords = board.getUsrCoordsOfMouse(e);
+                    let point = board.create('point', coords, {name: '', fixed: true, fillColor: 'red', strokeColor: 'red'});
+                    points.push(point);
+                    
+                    if (points.length === 6) {
+                        document.getElementById('predictBtn').disabled = false;
+                    }
+                }
+            });
+        }
+
+        document.getElementById('predictBtn').addEventListener('click', function() {
+            let x = points.map(p => p.X());
+            let y = points.map(p => p.Y());
+            
+            fetch('/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({x: x, y: y}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('result').innerText = `Error: ${data.error}`;
+                } else {
+                    console.log("Function string:", data.result.function);
+                    try {
+                        // Plot fitted points
+                        let x_common = data.result.x_common;
+                        let y_fit = data.result.y_fit;
+                        
+                        // Create a curve with the fitted points
+                        board.create('curve', [x_common, y_fit], {
+                            strokeColor: 'blue',
+                            strokeWidth: 2,
+                        });
+
+                        // Display the result
+                        let resultHTML = `<h2 class="function-result">Predicted Function: ${data.result.predicted_function}</h2>`;
+                        resultHTML += `<h2 class="function-result">Function: ${formatFunction(data.result.function)}</h2>`;
+                        resultHTML += '<h3>Input Points:</h3>';
+
+                        // Format points as an array of tuples
+                        let pointsArray = x.map((xi, i) => `(${xi.toFixed(2)}, ${y[i].toFixed(2)})`);
+                        resultHTML += `<p>[${pointsArray.join(', ')}]</p>`;
+
+                        document.getElementById('result').innerHTML = resultHTML;
+                    } catch (err) {
+                        console.error("Error plotting points:", err);
+                        document.getElementById('result').innerText = `Error plotting points: ${err.message}`;
+                    }
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                document.getElementById('result').innerText = `Error: ${error}`;
+            });
+        });
+
+        document.getElementById('clearBtn').addEventListener('click', function() {
+            // Destroy the entire board and reinitialize it
+            JXG.JSXGraph.freeBoard(board);
+            initializeBoard(); // Reinitialize the board to allow new points to be added
+
+            // Disable the predict button
+            document.getElementById('predictBtn').disabled = true;
+
+            // Clear the result text
+            document.getElementById('result').innerHTML = '';
+        });
+
+        function formatFunction(e_function) {
+            return e_function
+                .replace(/\*x\^1\b/g, '*x') // Replace x^1 with x
+                .replace(/(?<!\^)x\^1\b/g, 'x') // Replace any occurrence of x^1 that is not preceded by a caret with x
+                .replace(/x\^(\d+)/g, (match, p1) => `x<sup>${p1}</sup>`) // Format powers of x
+                .replace(/e\^(\d+)/g, (match, p1) => `e<sup>${p1}</sup>`) // Format e^number
+                .replace(/e\^\((.+?)\)/g, (match, p1) => `e<sup>${p1}</sup>`); // Format e^(expression)
+        }
+
+        // Initial board setup
+        initializeBoard();
+    </script>
+</body>
+</html>
