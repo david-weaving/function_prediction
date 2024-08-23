@@ -160,3 +160,7 @@ For later (ambitious, not guaranteed):
 
 Create page where the user simply clicks their points on a graph and it fits them.
 
+8/22/24
+
+Make changes to the exp function to remove NaN points.
+
