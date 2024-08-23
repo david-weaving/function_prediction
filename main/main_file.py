@@ -6,21 +6,18 @@ import sys
 
 
 x = [1,2,3,4,5,6]
-y = [1,4,9,16,25,36]
+y = [16,2,-2,0,3,7]
 
 
-x = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
-y = [5.00, 2.41, 2.04, 2.01, 2.00, 2.00]
-
-
+x = [-4.67,-2.87,-0.0222,2.60,4.44,6.36]
+y = [-2.13,-5.56,-6.93,-5.56,-1.93,2.90]
 
 predicted_function = func.predict_function(x,y)
 
-
+n= func.predict_degree(x,y)
 
 print(f'Your function: {predicted_function}')
 
-n = 3 # degree of polynomial
 if predicted_function == "polynomial":
     func.poly_avgerage(x,y,n)
 if predicted_function == "sine":
