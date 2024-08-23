@@ -3,23 +3,23 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from data import x_train, y_train
 
-# print(np.size(x_train,0))
-# print(np.size(y_train))
-# p=0
-# k=0
-# j=0
-# l = 0
-# for i in y_train:
-#     if i == "polynomial":
-#         p=p+1
-#     if i == "exponential":
-#         k=k+1
-#     if i == "sine":
-#         j=j+1
-#     if i == "ln":
-#         l=l+1
-# print(f'Exponentials: {k}, Poly: {p}, Sine: {j}, Natural Log: {l}')
-# exit()
+print(np.size(x_train,0))
+print(np.size(y_train))
+p=0
+k=0
+j=0
+l = 0
+for i in y_train:
+    if i == "polynomial":
+        p=p+1
+    if i == "exponential":
+        k=k+1
+    if i == "sine":
+        j=j+1
+    if i == "ln":
+        l=l+1
+print(f'Exponentials: {k}, Poly: {p}, Sine: {j}, Natural Log: {l}')
+exit()
 
 
 # Encode labels
