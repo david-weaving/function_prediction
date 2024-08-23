@@ -297,8 +297,8 @@ def sqrt_average(x,y):  # most likely not using this, the points are too sensiti
     plt.legend()
     plt.show()
 
-def ln_average(x,y):
-    def print_ln(A,B,C,D):
+def ln_average(x, y):
+    def print_ln(A, B, C, D):
         if C < 0 and D < 0:
             e_func = f"{A}ln({B}x - {abs(C)}) - {abs(D)}"
         elif C > 0 and D < 0:
@@ -310,44 +310,39 @@ def ln_average(x,y):
         return e_func
 
     def ln_func(x, A, B, C, D):
-        return A * np.log(B * x + C) + D
+        return np.where((B * x + C) > 0, A * np.log(B * x + C) + D, np.nan)
 
-    def fit_ln(x,y):
-        # guesses for A,B,C,D given y = Aln(Bx + C) + D
+    def fit_ln(x, y):
         A_guess = (np.max(y) - np.min(y)) / np.log(np.max(x) + 1)
         B_guess = 1 / (np.max(x) - np.min(x))
-        C_guess = abs(np.min(x)) + 1  # shift to ensure the logarithm argument is positive
+        C_guess = abs(np.min(x)) + 1
         D_guess = np.mean(y) - A_guess * np.log(B_guess * np.mean(x) + C_guess)
         initial_guess = [A_guess, B_guess, C_guess, D_guess]
 
-        # fit the curve for ln
-        params, _ = curve_fit(ln_func, x, y, p0=initial_guess, maxfev=30000)
-        
+        try:
+            params, _ = curve_fit(ln_func, x, y, p0=initial_guess, maxfev=30000)
+        except RuntimeError:
+            # If curve fitting fails, use initial guess
+            params = initial_guess
+
         return params
 
+    A, B, C, D = fit_ln(x, y)
 
-    A, B, C, D = fit_ln(x,y)
-
-    print_ln(A,B,C,D)
-
-
-
-    x_min = np.min(x)
-    x_max = np.max(x)
-    y_max = np.max(y)
-    y_min = np.min(y)
-
+    x_min, x_max = np.min(x), np.max(x)
     x_common = np.linspace(x_min, x_max, 400)
+    x_forward = np.linspace(x_max + 0.1, 150, 400)
+    x_backward = np.linspace(max((0.1 - C) / B, x_min - 0.1), x_min - 0.1, 400)
+    x_common = np.concatenate([x_backward, x_common, x_forward])
 
-    # continue the graph
-    x_forward = np.linspace(x_max+0.1, 150, 400)
-    x_backward = np.linspace((0.1-C)/B, x_min-0.1, 400) # C * -1 is the end bound (where we dont go below zero in our square root)
-    x_common = np.append(x_common, x_forward)
-    x_common = np.insert(x_common, 0, x_backward)
+    y_values = ln_func(x_common, A, B, C, D)
 
-    y_values = ln_func(x_common,A,B,C,D)
+    # Remove NaN and Inf values
+    valid_indices = np.isfinite(y_values)
+    x_common = x_common[valid_indices]
+    y_values = y_values[valid_indices]
 
-    return x_common.tolist(), y_values.tolist(), print_ln(A,B,C,D)
+    return x_common.tolist(), y_values.tolist(), print_ln(A, B, C, D)
 
 def predict_function(x,y,model): # predicts funtion
 
