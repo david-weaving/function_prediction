@@ -164,3 +164,7 @@ Create page where the user simply clicks their points on a graph and it fits the
 
 Make changes to the exp function to remove NaN points.
 
+08/23/24
+
+Exp problem solved, do more testing
+
