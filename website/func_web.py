@@ -108,14 +108,24 @@ def poly_average(x,y,degree):
     
     return x_common.tolist(), y_values.tolist(), print_poly(coeffs)
 
+
 def exp_average(x, y):
     def exp_model(x, A, b, C):
         return A * np.exp(b * x) + C
 
     def initial_guess(x_points, y_points):
         A_guess = (np.max(y_points) - np.min(y_points)) / (np.exp(np.max(x_points)) - np.exp(np.min(x_points)))
-        b_guess = np.log(y_points[-1] / y_points[0]) / (x_points[-1] - x_points[0]) if y_points[0] != 0 else 0.1
-        C_guess = np.min(y_points)
+        
+        try:
+            b_guess = np.log(y_points[-1] / y_points[0]) / (x_points[-1] - x_points[0])
+            if np.isnan(b_guess):
+                b_guess = 0.1  # if a negative falls into the log we default guess
+        except (ValueError, IndexError):
+            b_guess = 0.1  # if there is some value error in the log we default guess
+            
+        
+        C_guess = np.min(y_points)  # C is guessed based on the smallest y value
+        
         return [A_guess, b_guess, C_guess]
 
     def print_exp(params):
@@ -124,7 +134,7 @@ def exp_average(x, y):
             if params[2] > 0:
                 return f"{params[0]}e^({np.round(params[1],decimals=2)}x) + {np.round(params[2],decimals=2)}"
             else:
-                return f"{params[0]}e^({np.round(params[1],decimals=2)}x) - {np.round(params[2],decimals=2)}"
+                return f"{params[0]}e^({np.round(params[1],decimals=2)}x) - {np.round(abs(params[2]),decimals=2)}"
         else:
             params = np.round(params, decimals=2)
             if params[2] > 0:
@@ -150,8 +160,10 @@ def exp_average(x, y):
 
     y_fit = exp_model(x_common, A_fit, b_fit, C_fit)
 
-    # Replace inf values with the largest finite number
-    y_fit[np.isinf(y_fit)] = np.finfo(float).max
+    # Remove NaN and inf values
+    valid_indices = np.isfinite(y_fit)
+    x_common = x_common[valid_indices]
+    y_fit = y_fit[valid_indices]
 
     return x_common.tolist(), y_fit.tolist(), print_exp(params)
 
