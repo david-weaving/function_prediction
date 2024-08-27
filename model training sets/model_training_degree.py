@@ -78,7 +78,7 @@ reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
 # Train the model
 history = model.fit(x_train_reshaped, y_train_encoded, 
                     validation_data=(x_val_split, y_val_split),
-                    epochs=150, batch_size=32,
+                    epochs=1000, batch_size=32,
                     callbacks=[early_stopping, reduce_lr])
 
 # Evaluate model performance on validation data
