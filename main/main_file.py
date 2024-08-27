@@ -9,13 +9,15 @@ x = [1,2,3,4,5,6]
 y = [16,2,-2,0,3,7]
 
 
-x = [-13.70, -8.45, -11.93, -4.70, -6.86, -4.32]
-y = [9.38, -3.54, -5.67, -3.54, -3.28, 5.21]
+x=[-3.97, -1.19, 1.48, 3.99, 6.54, 9.06]
+
+y=[-8.93, -6.63, -4.80, -2.60, -0.60, 1.47]
 
 
 predicted_function = func.predict_function(x,y)
-
+func.sine_average(x,y)
 n= func.predict_degree(x,y)
+exit()
 
 print(f'Your function: {predicted_function}')
 
