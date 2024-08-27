@@ -143,7 +143,7 @@ def exp_average(x, y):
                 return f"{params[0]}e^({params[1]}x) - {abs(params[2])}"
 
     try:
-        params, _ = curve_fit(exp_model, x, y, p0=initial_guess(x, y), maxfev=10000)
+        params, _ = curve_fit(exp_model, x, y, p0=initial_guess(x, y), maxfev=100000)
     except RuntimeError:
         # If curve_fit fails, use a simple exponential model
         A = np.max(y) - np.min(y)
