@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import itertools
-from scipy.optimize import curve_fit
+from scipy.optimize import differential_evolution, curve_fit
 import tensorflow as tf
 
 def sort_array(x,y):
@@ -233,101 +233,107 @@ def exp_average(x, y):
     plt.show()
 
 def sine_average(x, y):
+    # Sine function for evaluation
+    def sineval(x, A, B, C, D):
+        return A * np.sin(B * np.asarray(x) + C) + D
 
-    # fitting sine function
+    # Fitting sine function with multi-start approach
     def fit_sine(x_points, y_points):
-
-        # initial guess for the form Asin(Bx + D) + C
-        A_guess = (np.max(y_points) - np.min(y_points)) / 2 # amplitude
-        B_guess = 2 * np.pi / (np.max(x_points) - np.min(x_points))  # frequency
-        D_guess = 0 # shift
-        C_guess = np.mean(y_points) # off set
+        y_range = np.max(y_points) - np.min(y_points)
+        x_range = np.max(x_points) - np.min(x_points)
         
-        initial_guess = [A_guess, B_guess, D_guess, C_guess]
+        # Generate multiple initial guesses
+        A_guesses = [y_range/2, y_range/4, y_range]
+        B_guesses = [2*np.pi/x_range, np.pi/x_range, 4*np.pi/x_range]
+        C_guesses = [0, np.pi/2, np.pi, 3*np.pi/2]
+        D_guesses = [np.mean(y_points), np.median(y_points)]
         
-        # Fit the model to the points
-        params, _ = curve_fit(sineval, x_points, y_points, p0=initial_guess,maxfev=50000) # once again curve_fit helps us fit the curve given an f(x) input, in this case; f(x)=Asin(Bx+D)+C
-        return params
+        best_params = None
+        lowest_error = np.inf
+        
+        for A in A_guesses:
+            for B in B_guesses:
+                for C in C_guesses:
+                    for D in D_guesses:
+                        try:
+                            params, _ = curve_fit(sineval, x_points, y_points, p0=[A, B, C, D], maxfev=10000)
+                            params = [float(p) for p in params]
+                            error = np.sum((sineval(x_points, *params) - y_points) ** 2)
+                            if error < lowest_error:
+                                lowest_error = error
+                                best_params = params
+                        except Exception as e:
+                            print(f"Fit failed with initial guess A={A}, B={B}, C={C}, D={D}. Error: {e}")
+                            print(f"x_points type: {type(x_points)}, shape: {np.shape(x_points)}")
+                            print(f"y_points type: {type(y_points)}, shape: {np.shape(y_points)}")
+                            continue
+        
+        if best_params is None:
+            raise RuntimeError("Failed to fit sine function with any initial guesses.")
+        
+        return best_params
 
-    # sine function for evaluation
-    def sineval(x, A, B, D, C):
-        return A * np.sin(B * x + D) + C
+    # Convert inputs to numpy arrays if they aren't already
+    x = np.asarray(x)
+    y = np.asarray(y)
 
-    # for printing the function
-    def print_sine(A,B,C,D):
-        if D > 0 and C > 0:
-            print(f"Your SINE function: {A}sin({B}x + {D}) + {C}")
-        elif D < 0 and C > 0:
-            print(f"Your SINE function: {A}sin({B}x - {abs(D)}) + {C}")
-        elif D > 0 and C < 0:
-            print(f"Your SINE function: {A}sin({B}x + {D}) - {abs(C)}")
-        else:
-            print(f"Your SINE function: {A}sin({B}x - {abs(D)}) - {abs(C)}")
+    # For printing the function
+    def print_sine(A, B, C, D):
+        phase = f"+ {C:.4f}" if C >= 0 else f"- {abs(C):.4f}"
+        offset = f"+ {D:.4f}" if D >= 0 else f"- {abs(D):.4f}"
+        print(f"Your SINE function: {A:.4f} * sin({B:.4f}x {phase}) {offset}")
 
-    x_min = np.min(x)
-    x_max = np.max(x)
-    y_max = np.max(y)
-    y_min = np.min(y)
+    x_min, x_max = np.min(x), np.max(x)
+    y_min, y_max = np.min(y), np.max(y)
 
-    x_common = np.linspace(x_min, x_max, 900)
-
-    # continue the graph
-    x_forward = np.linspace(x_max+0.1, 150, 900)
-    x_backward = np.linspace(-150, x_min-0.1, 900)
-    x_common = np.append(x_common, x_forward)
-    x_common = np.insert(x_common, 0, x_backward)
-
+    # Generate x values for plotting
+    x_range = x_max - x_min
+    x_common = np.linspace(x_min - 0.5*x_range, x_max + 0.5*x_range, 1000)
 
     try:
-        A, B, D, C = fit_sine(x, y)
-        y_values = sineval(x_common, A, B, D, C)
+        A, B, C, D = fit_sine(x, y)
+        print(f"Fitted parameters: A={A}, B={B}, C={C}, D={D}")
+        y_values = sineval(x_common, A, B, C, D)
+        print_sine(A, B, C, D)
     except RuntimeError as e:
         print(f"Error fitting data: {e}")
-        exit()
-
-    print_sine(A,B,C,D)
+        return
 
     # Plotting
-    x_margin = (x_max - x_min) * 0.1
-    y_margin = (y_max - y_min) * 0.1
+    def plot_with_margin(x, y, x_fit, y_fit, title):
+        x_margin = (x_max - x_min) * 0.1
+        y_margin = (y_max - y_min) * 0.1
+        
+        plt.figure(figsize=(10, 6))
+        plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Data Points', zorder=2)
+        if len(x_fit) > 0:
+            plt.plot(x_fit, y_fit, color='red', label='Fitted Sine', zorder=1)
+        plt.xlabel('X-axis')
+        plt.ylabel('Y-axis')
+        plt.title(title)
+        plt.grid(True, alpha=0.3)
+        plt.xlim(x_min - x_margin, x_max + x_margin)
+        plt.ylim(y_min - y_margin, y_max + y_margin)
+        plt.legend()
+        plt.show()
 
-    x_plot_min = x_min - x_margin
-    x_plot_max = x_max + x_margin
-    y_plot_min = y_min - y_margin
-    y_plot_max = y_max + y_margin
+    # Plot original data points
+    plot_with_margin(x, y, [], [], 'Original Data Points')
 
+    # Plot fitted sine with data points
+    plot_with_margin(x, y, x_common, y_values, 'Sine Fitting')
 
-    plt.figure(figsize=(8, 6))
-    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points', zorder=2)
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.title('User Points')
-    plt.grid(True)
-    plt.xlim(x_plot_min, x_plot_max)
-    plt.ylim(y_plot_min, y_plot_max)
-    plt.legend()
-    plt.show()
-
-    plt.figure(figsize=(8, 6))
-    plt.scatter(x, y, color='blue', alpha=0.6, marker='o', label='Your Points', zorder=2)
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.title('Sine Fitting')
-    plt.grid(True)
-    plt.xlim(x_plot_min, x_plot_max)
-    plt.ylim(y_plot_min, y_plot_max)
-    plt.plot(x_common, y_values, color='red', label='Average Graph', zorder=1)
-    plt.legend()
-    plt.show()
-
-    plt.figure(figsize=(8, 6))
-    plt.plot(x_common, y_values, color='red', label='Average Graph', zorder=1)
+    # Plot full fitted sine
+    plt.figure(figsize=(10, 6))
+    plt.plot(x_common, y_values, color='red', label='Fitted Sine')
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
     plt.title('Sine Fitting (Full Graph)')
-    plt.grid(True)
+    plt.grid(True, alpha=0.3)
     plt.legend()
     plt.show()
+
+
 
 def sqrt_average(x,y):  # most likely not using this, the points are too sensitive
     
