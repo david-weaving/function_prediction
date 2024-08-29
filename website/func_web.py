@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import itertools
-from scipy.optimize import curve_fit
+from scipy.optimize import differential_evolution, curve_fit
 import tensorflow as tf
 
 
@@ -168,28 +168,53 @@ def exp_average(x, y):
     return x_common.tolist(), y_fit.tolist(), print_exp(params)
 
 def sine_average(x, y):
+    # Convert inputs to numpy arrays if they aren't already
+    x = np.asarray(x)
+    y = np.asarray(y)
 
-    # fitting sine function
+    # Sine function for evaluation
+    def sineval(x, A, B, D, C):
+        return A * np.sin(B * np.asarray(x) + D) + C
+
+    # Fitting sine function
     def fit_sine(x_points, y_points):
-
-        # initial guess for the form Asin(Bx + D) + C
-        A_guess = (np.max(y_points) - np.min(y_points)) / 2 # amplitude
+        # Initial guess for the form Asin(Bx + D) + C
+        A_guess = (np.max(y_points) - np.min(y_points)) / 2  # amplitude
         B_guess = 2 * np.pi / (np.max(x_points) - np.min(x_points))  # frequency
-        D_guess = 0 # shift
-        C_guess = np.mean(y_points) # off set
+        D_guess = 0  # shift
+        C_guess = np.mean(y_points)  # offset
         
         initial_guess = [A_guess, B_guess, D_guess, C_guess]
         
-        # Fit the model to the points
-        params, _ = curve_fit(sineval, x_points, y_points, p0=initial_guess,maxfev=50000) # once again curve_fit helps us fit the curve given an f(x) input, in this case; f(x)=Asin(Bx+D)+C
-        return params
+        # Multi-start approach
+        best_params = None
+        lowest_error = np.inf
+        
+        guesses = [
+            initial_guess,
+            [A_guess/2, B_guess*2, np.pi/2, C_guess],
+            [A_guess*2, B_guess/2, np.pi, C_guess],
+            [A_guess, B_guess, 3*np.pi/2, C_guess]
+        ]
+        
+        for guess in guesses:
+            try:
+                params, _ = curve_fit(sineval, x_points, y_points, p0=guess, maxfev=50000)
+                error = np.sum((sineval(x_points, *params) - y_points) ** 2)
+                if error < lowest_error:
+                    lowest_error = error
+                    best_params = params
+            except Exception as e:
+                print(f"Fit failed with initial guess {guess}. Error: {e}")
+                continue
+        
+        if best_params is None:
+            raise RuntimeError("Failed to fit sine function with any initial guesses.")
+        
+        return best_params
 
-    # sine function for evaluation
-    def sineval(x, A, B, D, C):
-        return A * np.sin(B * x + D) + C
-
-    # for printing the function
-    def print_sine(A,B,C,D):
+    # For printing the function
+    def print_sine(A, B, C, D):
         A = np.round(A, decimals=2)
         B = np.round(B, decimals=2)
         C = np.round(C, decimals=2)
@@ -213,22 +238,22 @@ def sine_average(x, y):
 
     x_common = np.linspace(x_min, x_max, 400)
 
-    # continue the graph
+    # Continue the graph
     x_forward = np.linspace(x_max+0.1, 50+np.max(x), 400)
     x_backward = np.linspace(-50-abs(np.min(x)), x_min-0.1, 400)
     x_common = np.append(x_common, x_forward)
     x_common = np.insert(x_common, 0, x_backward)
-
 
     try:
         A, B, D, C = fit_sine(x, y)
         y_values = sineval(x_common, A, B, D, C)
     except RuntimeError as e:
         print(f"Error fitting data: {e}")
-        exit()
+        print(f"x type: {type(x)}, shape: {np.shape(x)}")
+        print(f"y type: {type(y)}, shape: {np.shape(y)}")
+        return [], [], "Fitting failed"
 
-    
-    return x_common.tolist(), y_values.tolist(), print_sine(A,B,C,D)
+    return x_common.tolist(), y_values.tolist(), print_sine(A, B, C, D)
 
 def sqrt_average(x,y):  # most likely not using this, the points are too sensitive
     
