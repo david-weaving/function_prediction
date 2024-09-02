@@ -11,7 +11,7 @@ Using the function predictor is very simple. First, you need 6 (x,y) points. The
 
 So, if you have the __x-points__: [1 , 2 , 3 , 4 , 5 , 6] and the __y-points__: [1 , 4 , 9 , 16 , 25 , 36] 
 
-#### Your points will plot as:
+### Your points will plot as:
 
 (1 , 1) , (2 , 4) , (3 , 9) , (4 , 16) , (5 , 25) , (6 , 36)
 
