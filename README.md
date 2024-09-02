@@ -25,3 +25,8 @@ So, if you have the __x-points__: [1 , 2 , 3 , 4 , 5 , 6] and the __y-points__: 
 ### The predictor will also return the function type and the function itself:
 
 ![Prediction](./images/predicted.JPG)
+
+
+## Interactive Prediction
+
+You can also try the interactive prediction [here!](https://www.functionprediction.com/choose)
