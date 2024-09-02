@@ -176,78 +176,72 @@ def sine_average(x, y):
     def sineval(x, A, B, D, C):
         return A * np.sin(B * np.asarray(x) + D) + C
 
+    # Cost function for optimization
+    def cost_function(params):
+        return np.sum((sineval(x, *params) - y) ** 2)
+
     # Fitting sine function
     def fit_sine(x_points, y_points):
-        # Initial guess for the form Asin(Bx + D) + C
-        A_guess = (np.max(y_points) - np.min(y_points)) / 2  # amplitude
-        B_guess = 2 * np.pi / (np.max(x_points) - np.min(x_points))  # frequency
-        D_guess = 0  # shift
-        C_guess = np.mean(y_points)  # offset
+        y_range = np.max(y_points) - np.min(y_points)
+        x_range = np.max(x_points) - np.min(x_points)
         
-        initial_guess = [A_guess, B_guess, D_guess, C_guess]
-        
-        # Multi-start approach
-        best_params = None
-        lowest_error = np.inf
-        
-        guesses = [
-            initial_guess,
-            [A_guess/2, B_guess*2, np.pi/2, C_guess],
-            [A_guess*2, B_guess/2, np.pi, C_guess],
-            [A_guess, B_guess, 3*np.pi/2, C_guess]
+        # Define bounds for parameters
+        bounds = [
+            (0, 2 * y_range),  # A: amplitude
+            (2*np.pi/(10*x_range), 20*np.pi/x_range),  # B: frequency
+            (-np.pi, np.pi),  # D: phase shift
+            (np.min(y_points), np.max(y_points))  # C: vertical shift
         ]
         
-        for guess in guesses:
-            try:
-                params, _ = curve_fit(sineval, x_points, y_points, p0=guess, maxfev=50000)
-                error = np.sum((sineval(x_points, *params) - y_points) ** 2)
-                if error < lowest_error:
-                    lowest_error = error
-                    best_params = params
-            except Exception as e:
-                print(f"Fit failed with initial guess {guess}. Error: {e}")
-                continue
+        # Global optimization using differential evolution
+        result = differential_evolution(cost_function, bounds, popsize=20, mutation=(0.5, 1.5), recombination=0.7, maxiter=1000)
         
-        if best_params is None:
-            raise RuntimeError("Failed to fit sine function with any initial guesses.")
+        # Refine the result with curve_fit
+        refined_params, _ = curve_fit(sineval, x_points, y_points, p0=result.x, maxfev=10000, bounds=tuple(map(list, zip(*bounds))))
         
-        return best_params
+        return refined_params
 
     # For printing the function
     def print_sine(A, B, C, D):
-        A = np.round(A, decimals=2)
-        B = np.round(B, decimals=2)
-        C = np.round(C, decimals=2)
-        D = np.round(D, decimals=2)
+        A = np.round(A, decimals=4)
+        B = np.round(B, decimals=4)
+        C = np.round(C, decimals=4)
+        D = np.round(D, decimals=4)
 
-        if D > 0 and C > 0:
+        if D >= 0 and C >= 0:
             e_func = f"{A}sin({B}x + {D}) + {C}"
-        elif D < 0 and C > 0:
+        elif D < 0 and C >= 0:
             e_func = f"{A}sin({B}x - {abs(D)}) + {C}"
-        elif D > 0 and C < 0:
+        elif D >= 0 and C < 0:
             e_func = f"{A}sin({B}x + {D}) - {abs(C)}"
         else:
             e_func = f"{A}sin({B}x - {abs(D)}) - {abs(C)}"
         
         return e_func
 
-    x_min = np.min(x)
-    x_max = np.max(x)
-    y_max = np.max(y)
-    y_min = np.min(y)
-
-    x_common = np.linspace(x_min, x_max, 400)
+    x_min, x_max = np.min(x), np.max(x)
+    y_max, y_min = np.max(y), np.min(y)
 
     # Continue the graph
-    x_forward = np.linspace(x_max+0.1, 50+np.max(x), 400)
-    x_backward = np.linspace(-50-abs(np.min(x)), x_min-0.1, 400)
+    x_common = np.linspace(x_min, x_max, 4000)
+    x_forward = np.linspace(x_max+0.1, 150+np.max(x), 4000)
+    x_backward = np.linspace(-150-abs(np.min(x)), x_min-0.1, 4000)
     x_common = np.append(x_common, x_forward)
     x_common = np.insert(x_common, 0, x_backward)
 
     try:
         A, B, D, C = fit_sine(x, y)
         y_values = sineval(x_common, A, B, D, C)
-    except RuntimeError as e:
+        
+        # Calculate R-squared to measure goodness of fit
+        y_mean = np.mean(y)
+        ss_tot = np.sum((y - y_mean)**2)
+        ss_res = np.sum((y - sineval(x, A, B, D, C))**2)
+        r_squared = 1 - (ss_res / ss_tot)
+        
+        print(f"R-squared: {r_squared:.4f}")
+        
+    except Exception as e:
         print(f"Error fitting data: {e}")
         print(f"x type: {type(x)}, shape: {np.shape(x)}")
         print(f"y type: {type(y)}, shape: {np.shape(y)}")
