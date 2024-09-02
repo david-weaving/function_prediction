@@ -40,3 +40,6 @@ Instead of typing in 6 x-values and 6 y-values, you can simply click 6 points an
 
 You can try predict myself [here!](https://www.functionprediction.com/user_predict)
 
+With 'Predict Myself' you can use as many (and as little) points as you'd like. You can fit those points to any of the four functions available (Polynomial, Sine, Natural Log, Exponential).
+
+![Myself](./images/myse.JPG)
