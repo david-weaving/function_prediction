@@ -29,8 +29,14 @@ So, if you have the __x-values__: [1 , 2 , 3 , 4 , 5 , 6] and the __y-values__: 
 
 ## Interactive Prediction
 
-You can also try the interactive prediction [here!](https://www.functionprediction.com/choose)
+You can try the interactive prediction [here!](https://www.functionprediction.com/choose)
 
 Instead of typing in 6 x-values and 6 y-values, you can simply click 6 points anywhere on the graph and fit your points!
 
 ![Interactive](./images/inter.JPG)
+
+
+## Predict Myself
+
+You can try predict myself [here!](https://www.functionprediction.com/user_predict)
+
