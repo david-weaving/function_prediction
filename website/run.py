@@ -1,12 +1,12 @@
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logging
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # suppress TensorFlow logging
 
 from flask import Flask, request, jsonify, send_from_directory
 import func_web
 import tensorflow as tf
 
-# Ensure TensorFlow does not use any GPU devices
+
 tf.config.set_visible_devices([], 'GPU')
 
 app = Flask(__name__)
@@ -45,7 +45,7 @@ def poly_p():
         data = request.json
         x = data['x']
         y = data['y']
-        degree = int(data.get('degree', 3))  # Default to degree 3 if not provided
+        degree = int(data.get('degree', 3)) 
         x_common, y_fit, e_function = func_web.poly_average(x, y, degree)
 
         return jsonify({
@@ -148,7 +148,7 @@ def process():
         print(f"Error in process: {e}")
         return jsonify({"error": str(e)})
 
-# Ensure this block is commented out or removed for production
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
