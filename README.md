@@ -9,7 +9,7 @@ This app is a function predictor that takes in 6 (x,y) points. These points are 
 
 Using the function predictor is very simple. First, you need 6 (x,y) points. The function predictor only works with exactly 6 points. You can pull these from a data set, an existing function, or even make them up yourself! Ensure that your points are separated by commas.
 
-So, if you have the __x-points__: [1 , 2 , 3 , 4 , 5 , 6] and the __y-points__: [1 , 4 , 9 , 16 , 25 , 36] 
+So, if you have the __x-values__: [1 , 2 , 3 , 4 , 5 , 6] and the __y-values__: [1 , 4 , 9 , 16 , 25 , 36] 
 
 ### Your points will plot as:
 
@@ -30,3 +30,7 @@ So, if you have the __x-points__: [1 , 2 , 3 , 4 , 5 , 6] and the __y-points__: 
 ## Interactive Prediction
 
 You can also try the interactive prediction [here!](https://www.functionprediction.com/choose)
+
+Instead of typing in 6 x-values and 6 y-values, you can simply click 6 points anywhere on the graph and fit your points!
+
+![Interactive](./images/inter.JPG)
