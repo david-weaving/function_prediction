@@ -4,6 +4,8 @@ import itertools
 from scipy.optimize import differential_evolution, curve_fit
 import tensorflow as tf
 
+# all functions (mostly for fitting to functions)
+
 def sort_array(x,y):
 
     combined = list(zip(x, y))

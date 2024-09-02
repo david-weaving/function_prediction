@@ -4,6 +4,7 @@ from math import pow
 import func
 import sys
 
+# used mainly for testing outside of website.
 
 x = [1,2,3,4,5,6]
 y = [16,2,-2,0,3,7]
