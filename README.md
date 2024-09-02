@@ -21,3 +21,7 @@ So, if you have the __x-points__: [1 , 2 , 3 , 4 , 5 , 6] and the __y-points__: 
 ### Then the predictor will fit your points to a function:
 
 ![Fitted Example Points](./images/example%20points%20(fitted).JPG)
+
+### The predictor will also return the function type and the function itself:
+
+![Prediction](./images/predicted.JPG)
