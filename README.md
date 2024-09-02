@@ -14,5 +14,5 @@ So, if you have the __x-points__: [1 , 2 , 3 , 4 , 5 , 6] and the __y-points__: 
 (1 , 1) , (2 , 4) , (3 , 9) , (4 , 16) , (5 , 25) , (6 , 36)
 
 
-![Fitted Example Points](./images/example%20points%20(fitted).JPG)
+![Not Fitted Example Points](./images/example%20points%20(not%20fitted).JPG)
 
