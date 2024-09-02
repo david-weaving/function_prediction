@@ -68,6 +68,13 @@
         button:hover {
             background-color: #218838;
         }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        button:disabled:hover {
+            background-color: #6c757d;
+        }
         .links {
             margin-top: 27px;
             text-align: left;
@@ -143,11 +150,48 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+
+        .tooltip .tooltiptext.visible {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Function Prediction</h1>
+        <h1>Function Predictor</h1>
 
         <div class="input-container">
             <label for="x_input">X values (6 numbers comma separated):</label>
@@ -156,15 +200,18 @@
             <label for="y_input">Y values (6 numbers comma separated):</label>
             <input type="text" id="y_input" placeholder="e.g. 1,2,3,4,5,6">
 
-            <div class="button-container">
-                <button onclick="processData()">Get Prediction</button>
-                <button onclick="clearInputs()">Clear Inputs</button>
+        <div class="button-container">
+            <div class="tooltip">
+                <button id="predictButton" onclick="processData()" disabled>Get Prediction</button>
+                <span class="tooltiptext">Please enter 6 X and Y comma seperated values</span>
             </div>
+            <button onclick="clearInputs()">Clear Inputs</button>
+        </div>
 
             <div class="links">
                 <a href="/info">How It Works</a>
                 <a href="/user_predict">Predict Myself</a>
-                <a href="/choose">[BETA] Point Click</a>
+                <a href="/choose">Interactive Prediction</a>
             </div>
         </div>
 
@@ -215,29 +262,14 @@
             return a * Math.log(x) + b;
         }
 
-        function clearInputs() {
-            document.getElementById('x_input').value = '';
-            document.getElementById('y_input').value = '';
-            document.getElementById('results').innerHTML = '';
-            document.getElementById('fittedPointsContainer').style.display = 'none';
-            document.getElementById('fullFunctionContainer').style.display = 'none';
-            if (board) {
-                JXG.JSXGraph.freeBoard(board);
-                board = null; // Reset board variable
-            }
-            if (fullBoard) {
-                JXG.JSXGraph.freeBoard(fullBoard);
-                fullBoard = null; // Reset fullBoard variable
-            }
-        }
 
         function formatFunction(e_function) {
             return e_function
-                .replace(/\*x\^1\b/g, '*x') // Replace x^1 with x
-                .replace(/(?<!\^)x\^1\b/g, 'x') // Replace any occurrence of x^1 that is not preceded by a caret with x
-                .replace(/x\^(\d+)/g, (match, p1) => `x<sup>${p1}</sup>`) // Format powers of x
-                .replace(/e\^(\d+)/g, (match, p1) => `e<sup>${p1}</sup>`) // Format e^number
-                .replace(/e\^\((.+?)\)/g, (match, p1) => `e<sup>${p1}</sup>`); // Format e^(expression)
+                .replace(/\*x\^1\b/g, '*x') // x^1 is just x
+                .replace(/(?<!\^)x\^1\b/g, 'x')
+                .replace(/x\^(\d+)/g, (match, p1) => `x<sup>${p1}</sup>`) // powers of x
+                .replace(/e\^(\d+)/g, (match, p1) => `e<sup>${p1}</sup>`) // e^number
+                .replace(/e\^\((.+?)\)/g, (match, p1) => `e<sup>${p1}</sup>`); // e^(expression)
         }
 
         function createPredictedFunction(e_function, function_type) {
@@ -266,6 +298,60 @@
                 fullBoard.zoomOut();
             }
         }
+
+
+        function validateInputs() {
+            const x_input = document.getElementById('x_input').value;
+            const y_input = document.getElementById('y_input').value;
+            const predictButton = document.getElementById('predictButton');
+
+            const x_values = x_input.split(',').map(x => x.trim()).filter(x => x !== '');
+            const y_values = y_input.split(',').map(y => y.trim()).filter(y => y !== '');
+
+            if (x_values.length === 6 && y_values.length === 6 &&
+                x_values.every(x => !isNaN(parseFloat(x))) &&
+                y_values.every(y => !isNaN(parseFloat(y)))) {
+                predictButton.disabled = false;
+            } else {
+                predictButton.disabled = true;
+            }
+        }
+
+        // event for inputs
+        document.getElementById('x_input').addEventListener('input', validateInputs);
+        document.getElementById('y_input').addEventListener('input', validateInputs);
+
+        // event for tooltip (button message)
+        const tooltipContainer = document.querySelector('.tooltip');
+        const tooltipText = document.querySelector('.tooltiptext');
+
+        tooltipContainer.addEventListener('mouseenter', function() {
+            if (document.getElementById('predictButton').disabled) {
+                tooltipText.classList.add('visible');
+            }
+        });
+
+        tooltipContainer.addEventListener('mouseleave', function() {
+            tooltipText.classList.remove('visible');
+        });
+
+        function clearInputs() {
+            document.getElementById('x_input').value = '';
+            document.getElementById('y_input').value = '';
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('fittedPointsContainer').style.display = 'none';
+            document.getElementById('fullFunctionContainer').style.display = 'none';
+            if (board) {
+                JXG.JSXGraph.freeBoard(board);
+                board = null;
+            }
+            if (fullBoard) {
+                JXG.JSXGraph.freeBoard(fullBoard);
+                fullBoard = null;
+            }
+            validateInputs(); // button disabled after inputs are cleared
+        }
+
 
         async function processData() {
             try {
@@ -372,7 +458,6 @@
                 });
 
                 fullBoard.create('functiongraph', [predictedFunc], {strokeColor: 'blue'});
-
                 const fullFittedPoints = fullBoard.create('curve', [x_common, y_fit], {
                     strokeColor: 'blue',
                     strokeWidth: 2,

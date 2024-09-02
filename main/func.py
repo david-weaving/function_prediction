@@ -5,38 +5,30 @@ from scipy.optimize import differential_evolution, curve_fit
 import tensorflow as tf
 
 def sort_array(x,y):
-    # Combine the arrays using zip
+
     combined = list(zip(x, y))
 
-    # Sort the combined list by the first element (elements of x)
     sorted_combined = sorted(combined, key=lambda pair: pair[0])
 
-    # Unzip the combined list back into two separate lists
     x_sorted, y_sorted = zip(*sorted_combined)
 
-    # Convert the tuples back to lists
     x_sorted = list(x_sorted)
     y_sorted = list(y_sorted)
 
     return x_sorted, y_sorted
 
 def rearrange_arrays(array1, array2):
-    # Step 1: Combine and sort arrays
     combined = sorted(zip(array1, array2), key=lambda x: x[0])
     
-    # Unzip sorted pairs back into separate arrays
     sorted_array1, sorted_array2 = zip(*combined)
     
-    # Convert to lists for easier manipulation
     sorted_array1 = list(sorted_array1)
     sorted_array2 = list(sorted_array2)
     
-    # Step 2: Extract highest, lowest, and third highest values
     highest = sorted_array1[-1]
     lowest = sorted_array1[0]
     third_highest = sorted_array1[-3]
-    
-    # Step 3: Remove highest, lowest, and third highest from sorted lists
+
     sorted_array1.remove(highest)
     sorted_array1.remove(lowest)
     sorted_array1.remove(third_highest)
@@ -45,7 +37,7 @@ def rearrange_arrays(array1, array2):
     index_lowest = sorted_array2.pop(0)
     index_third_highest = sorted_array2.pop(-2)  # third highest is now the second from the end after popping highest
     
-    # Step 4: Rearrange arrays
+
     new_array1 = [highest, lowest, third_highest] + sorted_array1
     new_array2 = [index_highest, index_lowest, index_third_highest] + sorted_array2
     
@@ -233,16 +225,14 @@ def exp_average(x, y):
     plt.show()
 
 def sine_average(x, y):
-    # Sine function for evaluation
+
     def sineval(x, A, B, C, D):
         return A * np.sin(B * np.asarray(x) + C) + D
 
-    # Fitting sine function with multi-start approach
     def fit_sine(x_points, y_points):
         y_range = np.max(y_points) - np.min(y_points)
         x_range = np.max(x_points) - np.min(x_points)
         
-        # Generate multiple initial guesses
         A_guesses = [y_range/2, y_range/4, y_range]
         B_guesses = [2*np.pi/x_range, np.pi/x_range, 4*np.pi/x_range]
         C_guesses = [0, np.pi/2, np.pi, 3*np.pi/2]
@@ -273,11 +263,9 @@ def sine_average(x, y):
         
         return best_params
 
-    # Convert inputs to numpy arrays if they aren't already
     x = np.asarray(x)
     y = np.asarray(y)
 
-    # For printing the function
     def print_sine(A, B, C, D):
         phase = f"+ {C:.4f}" if C >= 0 else f"- {abs(C):.4f}"
         offset = f"+ {D:.4f}" if D >= 0 else f"- {abs(D):.4f}"
@@ -286,7 +274,6 @@ def sine_average(x, y):
     x_min, x_max = np.min(x), np.max(x)
     y_min, y_max = np.min(y), np.max(y)
 
-    # Generate x values for plotting
     x_range = x_max - x_min
     x_common = np.linspace(x_min - 0.5*x_range, x_max + 0.5*x_range, 1000)
 
@@ -299,7 +286,6 @@ def sine_average(x, y):
         print(f"Error fitting data: {e}")
         return
 
-    # Plotting
     def plot_with_margin(x, y, x_fit, y_fit, title):
         x_margin = (x_max - x_min) * 0.1
         y_margin = (y_max - y_min) * 0.1
@@ -317,13 +303,11 @@ def sine_average(x, y):
         plt.legend()
         plt.show()
 
-    # Plot original data points
+
     plot_with_margin(x, y, [], [], 'Original Data Points')
 
-    # Plot fitted sine with data points
     plot_with_margin(x, y, x_common, y_values, 'Sine Fitting')
 
-    # Plot full fitted sine
     plt.figure(figsize=(10, 6))
     plt.plot(x_common, y_values, color='red', label='Fitted Sine')
     plt.xlabel('X-axis')
@@ -335,24 +319,20 @@ def sine_average(x, y):
 
 
 
-def sqrt_average(x,y):  # most likely not using this, the points are too sensitive
-    
-    # sqrt function
+def sqrt_average(x,y):
+
     def sqrt_func(x, A, C, D):
         return A * np.sqrt(x + C) + D
 
-    # inital guess for the form y = A*sqrt(x + C) + D
     def fit_square_root(x,y):
         A_guess = (y[-1] * np.sqrt(y[-2] * y[-2] - y[-3] * y[-3])) / (np.sqrt(x[-1] * (y[-2] * y[-2] - y[-3] * y[-3]) + y[-3] * y[-3] * x[-2] - x[-3] * y[-2] * y[-2]))
         C_guess = (y[-3] * y[-3] * x[-2] - x[-3] * y[-2] * y[-2]) / (y[-2] * y[-2] - y[-3] * y[-3])
         D_guess = y[-1] / (A_guess * np.sqrt(x[-1] + C_guess))
         initial_guess = [A_guess, C_guess, D_guess]
 
-        # Fit the model to all points
         params, _ = curve_fit(sqrt_func, x, y, p0=initial_guess, maxfev=50000)
         return params
 
-    # return A,C,D
     A_opt, C_opt, D_opt = fit_square_root(x,y)
 
     print(f"Square Root Function: {A_opt} * sqrt(x + {C_opt}) + {D_opt}")
@@ -364,7 +344,6 @@ def sqrt_average(x,y):  # most likely not using this, the points are too sensiti
 
     x_common = np.linspace(x_min, x_max, 400)
 
-    # continue the graph
     x_forward = np.linspace(x_max+0.1, 50, 400)
     x_backward = np.linspace(C_opt*-1, x_min-0.1, 400) # C_opt * -1 is the end bound (where we dont go below zero in our square root)
     x_common = np.append(x_common, x_forward)
@@ -372,7 +351,6 @@ def sqrt_average(x,y):  # most likely not using this, the points are too sensiti
 
     y_values = sqrt_func(x_common,A_opt,C_opt,D_opt)
 
-    # Plotting
     x_margin = (x_max - x_min) * 0.1
     y_margin = (y_max - y_min) * 0.1
 
@@ -545,9 +523,9 @@ def predict_degree_type(points, model):
 
 def predict_function_type(points, model): # returns function type
 
-    points_reshaped = np.array([points])  # Reshape to fit model input shape
+    points_reshaped = np.array([points]) 
     prediction = model.predict(points_reshaped)
-    predicted_class = np.argmax(prediction)  # Get index of highest probability
+    predicted_class = np.argmax(prediction)
     if predicted_class == 0:
         return "ln"
     elif predicted_class == 1:

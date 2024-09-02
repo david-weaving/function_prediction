@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Function Prediction</title>
+    <title>Interactive Function Predictor</title>
     <link rel="stylesheet" type="text/css" href="https://jsxgraph.org/distrib/jsxgraph.css" />
     <script type="text/javascript" src="https://jsxgraph.org/distrib/jsxgraphcore.js"></script>
     <style>
@@ -114,17 +114,15 @@
         let board, points;
 
         function initializeBoard() {
-            // Initialize the board
+
             board = JXG.JSXGraph.initBoard('jxgbox', {
                                 boundingbox: [-10, 10, 10, -10],
                 axis: true,
                 showCopyright: false
             });
 
-            // Initialize the points array
             points = [];
 
-            // Add event listener for adding points
             board.on('down', function(e) {
                 if (points.length < 6) {
                     let coords = board.getUsrCoordsOfMouse(e);
@@ -156,22 +154,22 @@
                 } else {
                     console.log("Function string:", data.result.function);
                     try {
-                        // Plot fitted points
+                        // plot points
                         let x_common = data.result.x_common;
                         let y_fit = data.result.y_fit;
                         
-                        // Create a curve with the fitted points
+                        // create curve with points
                         board.create('curve', [x_common, y_fit], {
                             strokeColor: 'blue',
                             strokeWidth: 2,
                         });
 
-                        // Display the result
+                        // display
                         let resultHTML = `<h2 class="function-result">Predicted Function: ${data.result.predicted_function}</h2>`;
                         resultHTML += `<h2 class="function-result">Function: ${formatFunction(data.result.function)}</h2>`;
                         resultHTML += '<h3>Input Points:</h3>';
 
-                        // Format x and y values in the desired format
+                        // format the function
                         let xValues = x.map(xi => xi.toFixed(2));
                         let yValues = y.map(yi => yi.toFixed(2));
                         resultHTML += `<p>x=[${xValues.join(', ')}]</p>`;
@@ -191,27 +189,27 @@
         });
 
         document.getElementById('clearBtn').addEventListener('click', function() {
-            // Destroy the entire board and reinitialize it
+            // loop and run the board again
             JXG.JSXGraph.freeBoard(board);
-            initializeBoard(); // Reinitialize the board to allow new points to be added
+            initializeBoard(); // allows board to add new points
 
-            // Disable the predict button
+            // button disabled
             document.getElementById('predictBtn').disabled = true;
 
-            // Clear the result text
+            // clear all text
             document.getElementById('result').innerHTML = '';
         });
 
         function formatFunction(e_function) {
             return e_function
-                .replace(/\*x\^1\b/g, '*x') // Replace x^1 with x
-                .replace(/(?<!\^)x\^1\b/g, 'x') // Replace any occurrence of x^1 that is not preceded by a caret with x
-                .replace(/x\^(\d+)/g, (match, p1) => `x<sup>${p1}</sup>`) // Format powers of x
-                .replace(/e\^(\d+)/g, (match, p1) => `e<sup>${p1}</sup>`) // Format e^number
-                .replace(/e\^\((.+?)\)/g, (match, p1) => `e<sup>${p1}</sup>`); // Format e^(expression)
+                .replace(/\*x\^1\b/g, '*x') // same function from index file
+                .replace(/(?<!\^)x\^1\b/g, 'x')
+                .replace(/x\^(\d+)/g, (match, p1) => `x<sup>${p1}</sup>`)
+                .replace(/e\^(\d+)/g, (match, p1) => `e<sup>${p1}</sup>`)
+                .replace(/e\^\((.+?)\)/g, (match, p1) => `e<sup>${p1}</sup>`);
         }
 
-        // Initial board setup
+        // board setup
         initializeBoard();
     </script>
 </body>

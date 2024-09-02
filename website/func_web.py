@@ -6,38 +6,31 @@ import tensorflow as tf
 
 
 def sort_array(x,y):
-    # Combine the arrays using zip
+
     combined = list(zip(x, y))
 
-    # Sort the combined list by the first element (elements of x)
     sorted_combined = sorted(combined, key=lambda pair: pair[0])
 
-    # Unzip the combined list back into two separate lists
     x_sorted, y_sorted = zip(*sorted_combined)
 
-    # Convert the tuples back to lists
     x_sorted = list(x_sorted)
     y_sorted = list(y_sorted)
 
     return x_sorted, y_sorted
 
 def rearrange_arrays(array1, array2):
-    # Step 1: Combine and sort arrays
+
     combined = sorted(zip(array1, array2), key=lambda x: x[0])
-    
-    # Unzip sorted pairs back into separate arrays
+
     sorted_array1, sorted_array2 = zip(*combined)
-    
-    # Convert to lists for easier manipulation
+
     sorted_array1 = list(sorted_array1)
     sorted_array2 = list(sorted_array2)
-    
-    # Step 2: Extract highest, lowest, and third highest values
+
     highest = sorted_array1[-1]
     lowest = sorted_array1[0]
     third_highest = sorted_array1[-3]
-    
-    # Step 3: Remove highest, lowest, and third highest from sorted lists
+
     sorted_array1.remove(highest)
     sorted_array1.remove(lowest)
     sorted_array1.remove(third_highest)
@@ -45,8 +38,7 @@ def rearrange_arrays(array1, array2):
     index_highest = sorted_array2.pop(-1)
     index_lowest = sorted_array2.pop(0)
     index_third_highest = sorted_array2.pop(-2)  # third highest is now the second from the end after popping highest
-    
-    # Step 4: Rearrange arrays
+
     new_array1 = [highest, lowest, third_highest] + sorted_array1
     new_array2 = [index_highest, index_lowest, index_third_highest] + sorted_array2
     
@@ -145,7 +137,7 @@ def exp_average(x, y):
     try:
         params, _ = curve_fit(exp_model, x, y, p0=initial_guess(x, y), maxfev=100000)
     except RuntimeError:
-        # If curve_fit fails, use a simple exponential model
+        # if curve_fit fails use simple exponential model
         A = np.max(y) - np.min(y)
         b = 0.1
         C = np.min(y)
@@ -160,7 +152,7 @@ def exp_average(x, y):
 
     y_fit = exp_model(x_common, A_fit, b_fit, C_fit)
 
-    # Remove NaN and inf values
+    # remove NaN and inf values
     valid_indices = np.isfinite(y_fit)
     x_common = x_common[valid_indices]
     y_fit = y_fit[valid_indices]
@@ -168,40 +160,35 @@ def exp_average(x, y):
     return x_common.tolist(), y_fit.tolist(), print_exp(params)
 
 def sine_average(x, y):
-    # Convert inputs to numpy arrays if they aren't already
+
     x = np.asarray(x)
     y = np.asarray(y)
 
-    # Sine function for evaluation
     def sineval(x, A, B, D, C):
         return A * np.sin(B * np.asarray(x) + D) + C
 
-    # Cost function for optimization
     def cost_function(params):
         return np.sum((sineval(x, *params) - y) ** 2)
 
-    # Fitting sine function
     def fit_sine(x_points, y_points):
         y_range = np.max(y_points) - np.min(y_points)
         x_range = np.max(x_points) - np.min(x_points)
         
-        # Define bounds for parameters
-        bounds = [
+        # bounds
+        bounds = [          # Asin(Bx + C) + D
             (0, 2 * y_range),  # A: amplitude
             (2*np.pi/(10*x_range), 20*np.pi/x_range),  # B: frequency
             (-np.pi, np.pi),  # D: phase shift
             (np.min(y_points), np.max(y_points))  # C: vertical shift
         ]
-        
-        # Global optimization using differential evolution
+
         result = differential_evolution(cost_function, bounds, popsize=20, mutation=(0.5, 1.5), recombination=0.7, maxiter=1000)
-        
-        # Refine the result with curve_fit
+
         refined_params, _ = curve_fit(sineval, x_points, y_points, p0=result.x, maxfev=10000, bounds=tuple(map(list, zip(*bounds))))
         
         return refined_params
 
-    # For printing the function
+    # printing function
     def print_sine(A, B, C, D):
         A = np.round(A, decimals=4)
         B = np.round(B, decimals=4)
@@ -222,7 +209,7 @@ def sine_average(x, y):
     x_min, x_max = np.min(x), np.max(x)
     y_max, y_min = np.max(y), np.min(y)
 
-    # Continue the graph
+    # for graphing, create points between the max and minimum of x and then add more points forwards and backwards.
     x_common = np.linspace(x_min, x_max, 4000)
     x_forward = np.linspace(x_max+0.1, 150+np.max(x), 4000)
     x_backward = np.linspace(-150-abs(np.min(x)), x_min-0.1, 4000)
@@ -230,10 +217,9 @@ def sine_average(x, y):
     x_common = np.insert(x_common, 0, x_backward)
 
     try:
-        A, B, D, C = fit_sine(x, y)
-        y_values = sineval(x_common, A, B, D, C)
-        
-        # Calculate R-squared to measure goodness of fit
+        A, B, D, C = fit_sine(x, y) # find our coeffs
+        y_values = sineval(x_common, A, B, D, C) # return every y point given our x points
+
         y_mean = np.mean(y)
         ss_tot = np.sum((y - y_mean)**2)
         ss_res = np.sum((y - sineval(x, A, B, D, C))**2)
@@ -249,7 +235,7 @@ def sine_average(x, y):
 
     return x_common.tolist(), y_values.tolist(), print_sine(A, B, C, D)
 
-def sqrt_average(x,y):  # most likely not using this, the points are too sensitive
+def sqrt_average(x,y):  # LEGACY -- not being used
     
     # sqrt function
     def sqrt_func(x, A, C, D):
@@ -262,7 +248,6 @@ def sqrt_average(x,y):  # most likely not using this, the points are too sensiti
         D_guess = y[-1] / (A_guess * np.sqrt(x[-1] + C_guess))
         initial_guess = [A_guess, C_guess, D_guess]
 
-        # Fit the model to all points
         params, _ = curve_fit(sqrt_func, x, y, p0=initial_guess, maxfev=50000)
         return params
 
@@ -286,7 +271,7 @@ def sqrt_average(x,y):  # most likely not using this, the points are too sensiti
 
     y_values = sqrt_func(x_common,A_opt,C_opt,D_opt)
 
-    # Plotting
+    # plotting
     x_margin = (x_max - x_min) * 0.1
     y_margin = (y_max - y_min) * 0.1
 
@@ -329,6 +314,7 @@ def sqrt_average(x,y):  # most likely not using this, the points are too sensiti
     plt.show()
 
 def ln_average(x, y):
+
     def print_ln(A, B, C, D):
         if C < 0 and D < 0:
             e_func = f"{A}ln({B}x - {abs(C)}) - {abs(D)}"
@@ -353,7 +339,7 @@ def ln_average(x, y):
         try:
             params, _ = curve_fit(ln_func, x, y, p0=initial_guess, maxfev=30000)
         except RuntimeError:
-            # If curve fitting fails, use initial guess
+            # if curve fitting fails use initial guess
             params = initial_guess
 
         return params
@@ -368,7 +354,7 @@ def ln_average(x, y):
 
     y_values = ln_func(x_common, A, B, C, D)
 
-    # Remove NaN and Inf values
+    # remove NaN and Inf values
     valid_indices = np.isfinite(y_values)
     x_common = x_common[valid_indices]
     y_values = y_values[valid_indices]
@@ -386,9 +372,10 @@ def predict_function(x,y,model): # predicts funtion
 
 def predict_function_type(points, model): # returns function type
 
-    points_reshaped = np.array([points])  # Reshape to fit model input shape
+    points_reshaped = np.array([points]) 
     prediction = model.predict(points_reshaped)
-    predicted_class = np.argmax(prediction)  # Get index of highest probability
+    predicted_class = np.argmax(prediction)
+    
     if predicted_class == 0:
         return "ln"
     elif predicted_class == 1:

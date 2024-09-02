@@ -92,7 +92,7 @@
         }
         .jxgbox {
             width: 100% !important;
-            height: 800px !important; /* Reduced height */
+            height: 800px !important;
             margin: 0 auto;
         }
         #fittedPointsContainer {
@@ -184,9 +184,7 @@
         function createPredictedFunction(e_function) {
             console.log("Creating function for:", e_function);
             try {
-                // Replace '^' with 'Math.pow()' for exponentiation
                 const jsFunction = e_function.replace(/x\^(\d+)/g, 'Math.pow(x, $1)');
-                // Replace scientific notation
                 const cleanedFunction = jsFunction.replace(/e(-?\d+)/g, '* Math.pow(10, $1)');
                 console.log("Cleaned function:", cleanedFunction);
                 return new Function('x', `return ${cleanedFunction}`);
@@ -263,7 +261,6 @@
                 const x_input = document.getElementById('x_input').value.trim();
                 const y_input = document.getElementById('y_input').value.trim();
 
-                // Check if inputs are empty
                 if (x_input === '' || y_input === '') {
                     document.getElementById('results').innerText = 'Error: Please enter both x and y values.';
                     return;
@@ -272,13 +269,11 @@
                 const x_values = x_input.split(',').map(Number);
                 const y_values = y_input.split(',').map(Number);
 
-                // Check if number of x and y values are equal
                 if (x_values.length !== y_values.length) {
                     document.getElementById('results').innerText = 'Error: The number of x values must match the number of y values.';
                     return;
                 }
 
-                // Check if there are any NaN values
                 if (x_values.some(isNaN) || y_values.some(isNaN)) {
                     document.getElementById('results').innerText = 'Error: Please enter valid numbers for all x and y values.';
                     return;
@@ -310,12 +305,10 @@
 
                 const predictedFunc = createPredictedFunction(e_function);
 
-                // Add a check to ensure the function is valid
                 if (typeof predictedFunc !== 'function') {
                     throw new Error('Failed to create a valid function');
                 }
 
-                // Plot fitted points
                 if (board) {
                     JXG.JSXGraph.freeBoard(board);
                 }
@@ -335,21 +328,17 @@
                     }
                 });
 
-                // Plot user points
                 x_values.forEach((x, i) => {
                     board.create('point', [x, y_values[i]], {name: '', fixed: true, fillColor: 'red', strokeColor: 'red'});
                 });
 
-                // Plot fitted curve
                 board.create('functiongraph', [predictedFunc], {strokeColor: 'blue'});
 
-                // Plot all fitted points
                 board.create('curve', [x_common, y_fit], {
                     strokeColor: 'blue',
                     strokeWidth: 2,
                 });
 
-                // Plot full function
                 if (fullBoard) {
                     JXG.JSXGraph.freeBoard(fullBoard);
                 }
@@ -371,7 +360,6 @@
 
                 fullBoard.create('functiongraph', [predictedFunc], {strokeColor: 'blue'});
 
-                // Plot all fitted points on full function graph
                 fullBoard.create('curve', [x_common, y_fit], {
                     strokeColor: 'blue',
                     strokeWidth: 2,
@@ -380,7 +368,6 @@
             } catch (error) {
                 console.error("Error in processData:", error);
                 document.getElementById('results').innerText = `Error: ${error.message}`;
-                // Clear the charts if there's an error
                 document.getElementById('fittedPointsContainer').style.display = 'none';
                 document.getElementById('fullFunctionContainer').style.display = 'none';
             }
